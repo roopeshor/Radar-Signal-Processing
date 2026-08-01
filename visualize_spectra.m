@@ -1,42 +1,52 @@
-function visualize_spectra(beams)
-    % visualize_spectra Plots the tile of 2D Range-Doppler power spectra.
-    
-    figure('Position', [100, 100, 1000, 800]);
-    
-    for i = 1:length(beams)
-        beam = beams(i);
-        
-        [beam_spectra, ~, ~] = process_radar_data(beam.BeamData);
-        
-        % Calculate max_velocity (Nyquist)
-        radarFreq = 205e6;
-        c = 299792458.0;
-        wavelength = c / radarFreq;
-        effective_sampling_time = beam.m_fIntrPulsePeriod_us * 1e-6 * beam.m_sNumOfCohIntegrations;
-        max_velocity = wavelength / (4.0 * effective_sampling_time);
-        
-        start_height = beam.m_fWindow1StartHeight;
-        end_height = beam.m_fWindow1EndHeight;
-        
-        % Calculate Power dB
-        warning('off', 'MATLAB:log:logOfZero');
-        power_db = 10 * log10(beam_spectra);
-        warning('on', 'MATLAB:log:logOfZero');
-        
-        subplot(2, 3, i);
-        
-        extent_x = [-max_velocity, max_velocity];
-        extent_y = [start_height, end_height];
-        imagesc(extent_x, extent_y, power_db);
-        % In MATLAB, imagesc puts y-axis top-down by default. 'YDir', 'normal' flips it.
-        set(gca, 'YDir', 'normal');
-        colormap('turbo');
-        
-        title(beam.direction);
-        xlabel('Doppler Velocity (m/s)');
-        ylabel('Altitude (km)');
-        
-        grid on;
-        set(gca, 'GridColor', 'k', 'GridLineStyle', '--', 'GridAlpha', 0.3);
-    end
+function visualize_spectra(beams, directions, options)
+
+arguments
+	beams (:, 1024, :) double
+	directions (:, 1) string
+	options.figsize = [2, 3] % size of figure
+	options.max_velocity = 30
+	options.start_height = 0 % in meters
+	options.end_height = 8000 % in meters
+	options.scalar function_handle = @(x) 10 * log10(x)  % scaling function
+end
+
+%VISUALIZE_SPECTRA  Plots the tile of 2D Range-Doppler power spectra.
+%
+%  plots denoised spectra of 5 beams in a tile.
+%  Each subplot shows power in dB versus Doppler velocity (m/s) and altitude (km).
+%  The function expects array of RadarData
+%
+%  Example:
+%      % With a variable 'beams' in workspace provided to the function's scope, run:
+%      visualize_spectra([beam.north, beam.south]);
+%
+%  See also process_beams
+
+
+figure('Position', [100, 100, 1000, 800]);
+
+for i = 1:size(beams, 3)
+	beam_spectra = beams(:, :, i);
+
+	% Calculate Power dB
+	warning('off', 'MATLAB:log:logOfZero');
+	power_db = options.scalar(beam_spectra);
+	warning('on', 'MATLAB:log:logOfZero');
+
+	subplot(options.figsize(1), options.figsize(2), i);
+
+	extent_x = [-options.max_velocity, options.max_velocity];
+	extent_y = [options.start_height, options.end_height];
+	imagesc(extent_x, extent_y, power_db);
+
+	title(directions(i));
+	xlabel('Doppler Velocity (m/s)');
+	ylabel('Altitude (km)');
+
+	grid on;
+	% In MATLAB, imagesc puts y-axis top-down by default. 'YDir', 'normal' flips it.
+	set(gca, 'YDir', 'normal');
+	colormap('jet');
+	set(gca, 'GridColor', 'k', 'GridLineStyle', '--', 'GridAlpha', 0.3);
+end
 end

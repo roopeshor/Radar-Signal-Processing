@@ -1,27 +1,59 @@
-% Front end script to find data, read it, process and visualize.
+filepath = fullfile("Data" , "EXP_DBS_CH4_29Jul2026_18_50_38");
+disp("Processing file: " + filepath);
 
-raws = dir(fullfile('Data', 'Mode_1' , '*.raw'));
+obs = Observation(filepath);
 
-if isempty(raws)
-    disp('No raw files found.');
-    return;
-end
+N = denoise_beam(obs.north);
+S = denoise_beam(obs.south);
+E = denoise_beam(obs.east);
+W = denoise_beam(obs.west);
+V = denoise_beam(obs.vertical);
 
-% Note: Python uses index 3, which corresponds to index 4 in MATLAB
-filepath = fullfile(raws(4).folder, raws(4).name);
-disp(['Processing file: ', filepath]);
+max_velocity = compute_max_velocity(...
+	N.m_fIntrPulsePeriod_us, ...
+	N.m_sNumOfCohIntegrations ...
+);
 
-dat = structure_data(filepath);
+%% Doppler Spectra
 
-% Reorder beams to match Python
-beams = [
-    dat.North
-    dat.East
-    dat.West
-    dat.South
-    dat.Vertical
-];
+spectras = cat(3,...
+	N.denoised_spectra,...
+	S.denoised_spectra,...
+	E.denoised_spectra,...
+	W.denoised_spectra ...
+);
 
-visualize_spectra(beams);
+visualize_spectra(...
+	spectras,...
+	["North", "South", "East", "West"], ...
+	figsize = [2 2],...
+	max_velocity = max_velocity, ...
+	start_height = N.start_height,...
+	end_height = N.end_height ...
+);
 
-disp('Processing complete.');
+%% Moments
+[N_M0, N_M1, N_M2] = compute_moments(N.denoised_spectra, N.ipp_us, N.n_coh);
+
+r = compute_height_ranges(...
+	N.start_height,...
+	N.m_fBaudLength_us,...
+	N.m_sNumOfRangeBins ...
+);
+
+figure("Name", "Moments")
+subplot(1, 3, 1)
+N_M1 = medfilt1(N_M1, 5);
+plot(N.ref_M1 / max(N.ref_M1),r); hold on
+plot(N_M1 / max(N_M1),r)
+title("1st Moment (north)")
+legend(["ref", "calc"]);
+
+%% UVW
+subplot(1,3,2)
+plot(obs.ref_U / max(obs.ref_U) , r); hold on
+[S_M0, S_M1, S_M2] = compute_moments(S.denoised_spectra, S.ipp_us, S.n_coh);
+Uc = (N_M1 - S_M1) / (2 * sind(10)) * 3e8 / 205e6 / 2;
+
+plot(Uc / max(Uc) , r);
+legend(["ref", "calc"]);

@@ -10,4 +10,22 @@ While running, each script assume that a `Data` folder is sitting just next to i
 ```
 
 ## Running Matlab
-run `matlab/run.m`
+run `run.m` (entry point).
+
+
+## File path convention
+To have interoperability with multiple people and operating systems use matlab's `fullfile` function.
+
+Example:
+Instead of
+
+```m
+filepath = "Data\Mode_1\EXP_DBS_CH4_01Jun2025_10_42_31.raw"
+```
+
+use:
+```m
+filepath = fullfile("Data", "Mode_1",  "EXP_DBS_CH4_01Jun2025_10_42_31.raw")
+```
+
+Also put the data folder next to the code file (instead of putting it in the desktop or another disk):
