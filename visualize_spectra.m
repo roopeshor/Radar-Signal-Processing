@@ -23,7 +23,7 @@ end
 %  See also process_beams
 
 
-figure('Position', [100, 100, 1000, 800]);
+figure("Name", "Spectra");
 
 for i = 1:size(beams, 3)
 	beam_spectra = beams(:, :, i);

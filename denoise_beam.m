@@ -1,4 +1,8 @@
 function out_beam = denoise_beam(beam)
+	%denoise_beam denoises beam using hildebrand sekhon method.
+	% alternatively, modify line 9 to implement own noise estimator
+	% This function should return modified beam and output should be
+	% written in denoised_spectra property of beam
 	arguments
 		beam RadarData
 	end

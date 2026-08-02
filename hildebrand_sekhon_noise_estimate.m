@@ -40,7 +40,7 @@ function noise_level = hildebrand_sekhon_noise_estimate(spectrums, M)
 	%     noise_level - double (height_bins x 1).  Estimated mean noise power per
 	%                   Doppler bin for each range bin.
 	%
-	%   See also compute_spectra_from_beam_data, compute_moments
+	%   See also compute_spectra_from_beam_data, compute_beam_moments
 
 	arguments
 		spectrums (:, 1024) double

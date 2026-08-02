@@ -75,13 +75,18 @@ classdef RadarData
 		spectra                   (:, 1024) double  % double (RangeBins × NFFT) - averaged normalised power spectrum
 		denoised_spectra          (:, 1024) double  % double (RangeBins × NFFT) - denoised power spectrum. Its absent in read_raw_data
 
+		% ---- post processed data, populated by other functions ---------
+
+		M0                           (:, 1) double
+		M1                           (:, 1) double
+		M2                           (:, 1) double
 		% ---- reference data ---------
 		filepath                            string  % filepath of raw data
-		ref_height                (:, 1)    double  % given height of reference
-		ref_M0                    (:, 1)    double  % refernce 0th moment
-		ref_M1                    (:, 1)    double  % refernce 1st moment
-		ref_M2                    (:, 1)    double  % refernce 2nd moment
-		ref_SNR                   (:, 1)    double  % given SNR
-		ref_noise_level           (:, 1)    double  % given noise level
+		ref_height                   (:, 1) double  % given height of reference
+		ref_M0                       (:, 1) double  % refernce 0th moment
+		ref_M1                       (:, 1) double  % refernce 1st moment
+		ref_M2                       (:, 1) double  % refernce 2nd moment
+		ref_SNR                      (:, 1) double  % given SNR
+		ref_noise_level              (:, 1) double  % given noise level
 	end
 end

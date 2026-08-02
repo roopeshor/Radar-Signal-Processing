@@ -17,13 +17,12 @@ function spectra = compute_spectra_from_beam_data(beamData, window)
 	[~, nfft, ~] = size(beamData);
 
 	% DC Removal (Subtract the mean along the NFFT time axis - which is dim 2)
-	% dc_mean = mean(beamData, 2);
-	% dc_removed = beamData - dc_mean;
+	beamData = beamData - mean(beamData, 2);
 
 	% Reshape window to match (1, NFFT, 1) for broadcasting
 	% ie, repeats it along height direction
-	window_reshaped = reshape(window(nfft), [1, nfft, 1]);
-	beamData = beamData .* window_reshaped;
+	% window_reshaped = reshape(window(nfft), [1, nfft, 1]);
+	% beamData = beamData .* window_reshaped;
 
 	% FFT along dimension 2
 	spectraCube = fft(beamData, [], 2);

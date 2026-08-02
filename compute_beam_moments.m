@@ -1,25 +1,21 @@
-function [M0, M1, M2] = compute_moments(spectrum, ipp_us, n_coh)
-	% compute_moments computes woodman moments
+function out_beam = compute_beam_moments(beam)
+	% compute_beam_moments computes woodman moments and stores
+	% it in the beam's M0, M1, M2 fields nd returns the modifed beam
 	%
 	%   Input Arguments:
-	%     spectrum - spectrum to process
-	%     ipp_us - Inter-Pulse Period in microseconds
-	%              The time interval between consecutive transmitted radar pulses.
-	%     n_coh - Number of coherent integrations
+	%     beam - Number of coherent integrations
 	%
 	%   Output Arguments:
-	%     M0 - 0th moment array (column vector)
-	%     M1 - 1st moment array (column vector)
-	%     M2 - 2nd moment array (column vector)
+	%     out_beam - modified beam
 
 	arguments
-		spectrum (:, 1024) double
-		ipp_us (1,1) double
-		n_coh (1,1) double
+		beam RadarData
 	end
-	[height_bins, nfft] = size(spectrum);
+	ipp_us = beam.ipp_us;
+	n_coh = beam.n_coh;
+	[height_bins, nfft] = size(beam.spectra);
 
-	P_filtered = spectrum;
+	P_filtered = beam.spectra;
 
 	M0 = zeros(1, height_bins);
 	M1 = zeros(1, height_bins);
@@ -57,4 +53,8 @@ function [M0, M1, M2] = compute_moments(spectrum, ipp_us, n_coh)
 
 		M2(i) = sum(((freq - M1(i)) .^ 2) .* signal_block) / M0(i);
 	end
+	beam.M0 = M0;
+	beam.M1 = M1;
+	beam.M2 = M2;
+	out_beam = beam;
 end
