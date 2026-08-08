@@ -260,7 +260,7 @@ for dir = directions
 end
 end
 
-obs = mccf.compute_all_moments(obs)
+obs = simple.compute_all_moments(obs)
 
 ```
 
