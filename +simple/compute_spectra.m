@@ -1,11 +1,10 @@
-function spectra = compute_simple_spectra(beam, options)
+function spectra = compute_spectra(beam)
 	arguments
 		beam RadarData  % double complex (RangeBins × NFFT × InCohIntegrations)
 		% options.window function_handle = @hann
-		options struct
 	end
 
-	% compute_simple_spectra Most simplest spectra computer.
+	% compute_spectra Most simplest spectra computer.
 	%
 	%   Input Arguments:
 	%       beam - obtained from read_raw_file

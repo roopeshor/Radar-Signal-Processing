@@ -1,7 +1,6 @@
 filepath = fullfile("Data" , "Mode_2", "EXP_DBS_CH4_01Jun2025_18_04_28");
 disp("Processing file: " + filepath);
 
-% Define function handles for this run
 obs = Observation(filepath);
 
 N = obs.north;
@@ -10,23 +9,39 @@ E = obs.east;
 W = obs.west;
 V = obs.vertical;
 
-N.spectra = mccf.compute_mccf_spectra(N);
-S.spectra = mccf.compute_mccf_spectra(S);
-E.spectra = mccf.compute_mccf_spectra(E);
-W.spectra = mccf.compute_mccf_spectra(W);
-V.spectra = mccf.compute_mccf_spectra(V);
-
+%% old method
+% N.spectra = simple.compute_spectra(N);
+% S.spectra = simple.compute_spectra(S);
+% E.spectra = simple.compute_spectra(E);
+% W.spectra = simple.compute_spectra(W);
+% V.spectra = simple.compute_spectra(V);
 % N.denoised_spectra = simple.denoise_beam(N);
 % S.denoised_spectra = simple.denoise_beam(S);
 % E.denoised_spectra = simple.denoise_beam(E);
 % W.denoised_spectra = simple.denoise_beam(W);
 % V.denoised_spectra = simple.denoise_beam(V);
+% N = simple.compute_moments(N);
+% E = simple.compute_moments(E);
+% W = simple.compute_moments(W);
+% S = simple.compute_moments(S);
+% V = simple.compute_moments(V);
 
+%% MCCF Method
+N.spectra = mccf.compute_spectra(N);
+S.spectra = mccf.compute_spectra(S);
+E.spectra = mccf.compute_spectra(E);
+W.spectra = mccf.compute_spectra(W);
+V.spectra = mccf.compute_spectra(V);
 N.denoised_spectra = N.spectra;
 S.denoised_spectra = S.spectra;
 E.denoised_spectra = E.spectra;
 W.denoised_spectra = W.spectra;
 V.denoised_spectra = V.spectra;
+N = mccf.compute_moments(N);
+E = mccf.compute_moments(E);
+W = mccf.compute_moments(W);
+S = mccf.compute_moments(S);
+V = mccf.compute_moments(V);
 
 %% Doppler Spectra and Moments
 figure("Name", "Spectra");
@@ -38,11 +53,6 @@ vmax = utils.compute_max_velocity(...
 h_start = N.start_height / 1000;
 h_end = N.end_height / 1000;
 
-[N.M0, N.M1, N.M2, N.algorithm_parameters] = mccf.compute_mccf_moments(N);
-[E.M0, E.M1, E.M2, E.algorithm_parameters] = mccf.compute_mccf_moments(E);
-[W.M0, W.M1, W.M2, W.algorithm_parameters] = mccf.compute_mccf_moments(W);
-[S.M0, S.M1, S.M2, S.algorithm_parameters] = mccf.compute_mccf_moments(S);
-[V.M0, V.M1, V.M2, V.algorithm_parameters] = mccf.compute_mccf_moments(V);
 
 N.M1 = medfilt1(N.M1, 5);
 E.M1 = medfilt1(E.M1, 5);

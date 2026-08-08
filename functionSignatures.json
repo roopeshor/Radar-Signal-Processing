@@ -60,12 +60,12 @@
             {
                 "name": "noise_level",
                 "type": [["double"]],
-                "purpose": "Column vector (RangeBins × 1). Per-range-bin noise floor estimate produced by hildebrand_sekhon_noise_estimate."
+                "purpose": "Column vector (RangeBins × 1). Per-range-bin noise floor estimate produced by HS_noise_estimate."
             }
         ]
     },
 
-    "hildebrand_sekhon_noise_estimate": {
+    "HS_noise_estimate": {
         "inputs": [
             {
                 "name": "spectrums",
@@ -89,7 +89,7 @@
         ]
     },
 
-    "compute_beam_moments": {
+    "compute_moments": {
         "inputs": [
             {
                 "name": "denoised_spectrum",
@@ -201,7 +201,7 @@
                 "name": "computed_mmts",
                 "kind": "required",
                 "type": [["double"]],
-                "purpose": "Computed moments matrix in the same column layout as in_mmts, derived from compute_beam_moments and the noise estimates."
+                "purpose": "Computed moments matrix in the same column layout as in_mmts, derived from compute_moments and the noise estimates."
             }
         ],
         "outputs": []

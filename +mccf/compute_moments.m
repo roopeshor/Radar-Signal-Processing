@@ -1,5 +1,5 @@
-function [M0, M1, M2, alg_params] = compute_mccf_moments(beam)
-	% compute_mccf_moments computes woodman moments using MCCF cost function.
+function out_beam = compute_moments(beam)
+	% compute_moments computes woodman moments using MCCF cost function.
 	% Stores results in M0, M1, M2 and algorithm parameters.
 	% Uses beam.denoised_spectra if available, else beam.spectra.
 
@@ -108,4 +108,10 @@ function [M0, M1, M2, alg_params] = compute_mccf_moments(beam)
 	% Store algorithm parameters
 	alg_params = struct();
 	alg_params.cost_scores = cost_scores;
+
+	beam.M0 = M0;
+	beam.M1 = M1;
+	beam.M2 = M2;
+	beam.algorithm_parameters = alg_params;
+	out_beam = beam;
 end

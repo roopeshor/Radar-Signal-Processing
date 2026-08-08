@@ -8,7 +8,7 @@ function denoised_spectra = denoise_beam(beam)
 	end
 
 	[~, nfft] = size(beam.spectra);
-	noise_level = simple.hildebrand_sekhon_noise_estimate(beam.spectra, beam.m_sNumOfInCohIntegrations);
+	noise_level = simple.HS_noise_estimate(beam.spectra, beam.m_sNumOfInCohIntegrations);
 
 	% subtract noise level
 	noiseLevelPerBin = repmat(noise_level, 1, nfft);

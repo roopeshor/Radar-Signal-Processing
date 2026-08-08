@@ -1,5 +1,5 @@
-function out_beam = compute_beam_moments(beam)
-	% compute_beam_moments computes woodman moments and stores
+function out_beam = compute_moments(beam)
+	% compute_moments computes woodman moments and stores
 	% it in the beam's M0, M1, M2 fields nd returns the modifed beam
 	%
 	%   Input Arguments:

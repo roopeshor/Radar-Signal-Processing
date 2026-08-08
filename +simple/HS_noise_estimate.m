@@ -1,8 +1,8 @@
-function noise_level = hildebrand_sekhon_noise_estimate(spectrums, M)
-	% hildebrand_sekhon_noise_estimate  Estimate the mean noise floor of a
+function noise_level = HS_noise_estimate(spectrums, M)
+	% HS_noise_estimate  Estimate the mean noise floor of a
 	%   Doppler power spectrum using the Hildebrand-Sekhon method.
 	%
-	%   noise_level = hildebrand_sekhon_noise_estimate(spectrums, M)
+	%   noise_level = HS_noise_estimate(spectrums, M)
 	%
 	%   The algorithm assumes that the noise component of the spectrum obeys
 	%   a chi-squared distribution.  It sorts each row of the spectrum in
@@ -40,7 +40,7 @@ function noise_level = hildebrand_sekhon_noise_estimate(spectrums, M)
 	%     noise_level - double (height_bins x 1).  Estimated mean noise power per
 	%                   Doppler bin for each range bin.
 	%
-	%   See also compute_simple_spectra, compute_beam_moments
+	%   See also compute_simple_spectra, compute_moments
 
 	arguments
 		spectrums (:, 1024) double
