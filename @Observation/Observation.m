@@ -30,8 +30,8 @@ classdef Observation
 			arguments
 				basename string
 			end
-			raw = read_raw_file(basename + ".raw");
-			out = add_reference_data(raw, add_mmts=true, add_uvw=true);
+			raw = utils.read_raw_file(basename + ".raw");
+			out = utils.add_reference_data(raw, add_mmts=true, add_uvw=true);
 			[~, obj.observation_name, ~] = fileparts(basename);
 
 			obj.north = out.beam_struct.north;
@@ -39,8 +39,8 @@ classdef Observation
 			obj.west = out.beam_struct.west;
 			obj.south = out.beam_struct.south;
 			obj.vertical = out.beam_struct.vertical;
-			obj.DBS_Factor_H = compute_dbs_factor(obj.north.m_fOffZenith);
-			obj.DBS_Factor_V = compute_dbs_factor(obj.vertical.m_fOffZenith);
+			obj.DBS_Factor_H = utils.compute_dbs_factor(obj.north.m_fOffZenith);
+			obj.DBS_Factor_V = utils.compute_dbs_factor(obj.vertical.m_fOffZenith);
 
 			obj.ref_height = out.height;
 			obj.ref_U = out.U;

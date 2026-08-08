@@ -1,16 +1,35 @@
 # ST radar
 Reads ST Radar raw files and displays wind speeds in 5 directions (NEWS+Z).
 Implemented in MATLAB.
-While running, each script assume that a `Data` folder is sitting just next to it:
-```
-├── run.m
-├── Data
-│   ├── Mode_1
-│   │   ├── *.raw
-```
 
-## Running Matlab
-run `run.m` (entry point).
+## Folder structure
+The `run.m` is entry file. All functions to a particular class of algorithm (method) is put in a folder with "+" sign before it:
+```
+├── run.m                  <--- entry file
+│
+├── +mccf
+│   ├── compute_mccf_moments.m             |
+│   └── compute_mccf_spectra.m             |
+├── +simple                                |
+│   ├── compute_beam_moments.m             | <-- Methods
+│   ├── compute_simple_spectra.m           |
+│   ├── denoise_beam.m                     |
+│   └── hildebrand_sekhon_noise_estimate.m |
+│
+│
+├── @Observation                   |
+│   └── Observation.m              |
+├── @RadarData                     |
+│   └── RadarData.m                |
+└── +utils                         |
+    ├── add_reference_data.m       | <-- Utility files
+    ├── compute_dbs_factor.m       |
+    ├── compute_height_ranges.m    |
+    ├── compute_max_velocity.m     |
+    ├── get_beam_direction.m       |
+    └── read_raw_file.m            |
+
+```
 
 
 ## File path convention

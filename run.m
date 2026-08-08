@@ -10,17 +10,17 @@ E = obs.east;
 W = obs.west;
 V = obs.vertical;
 
-N.spectra = compute_mccf_spectra(N);
-S.spectra = compute_mccf_spectra(S);
-E.spectra = compute_mccf_spectra(E);
-W.spectra = compute_mccf_spectra(W);
-V.spectra = compute_mccf_spectra(V);
+N.spectra = mccf.compute_mccf_spectra(N);
+S.spectra = mccf.compute_mccf_spectra(S);
+E.spectra = mccf.compute_mccf_spectra(E);
+W.spectra = mccf.compute_mccf_spectra(W);
+V.spectra = mccf.compute_mccf_spectra(V);
 
-% N.denoised_spectra = denoise_beam(N);
-% S.denoised_spectra = denoise_beam(S);
-% E.denoised_spectra = denoise_beam(E);
-% W.denoised_spectra = denoise_beam(W);
-% V.denoised_spectra = denoise_beam(V);
+% N.denoised_spectra = simple.denoise_beam(N);
+% S.denoised_spectra = simple.denoise_beam(S);
+% E.denoised_spectra = simple.denoise_beam(E);
+% W.denoised_spectra = simple.denoise_beam(W);
+% V.denoised_spectra = simple.denoise_beam(V);
 
 N.denoised_spectra = N.spectra;
 S.denoised_spectra = S.spectra;
@@ -31,18 +31,18 @@ V.denoised_spectra = V.spectra;
 %% Doppler Spectra and Moments
 figure("Name", "Spectra");
 
-vmax = compute_max_velocity(...
+vmax = utils.compute_max_velocity(...
 	N.m_fIntrPulsePeriod_us, ...
 	N.m_sNumOfCohIntegrations ...
 );
 h_start = N.start_height / 1000;
 h_end = N.end_height / 1000;
 
-[N.M0, N.M1, N.M2, N.algorithm_parameters] = compute_mccf_moments(N);
-[E.M0, E.M1, E.M2, E.algorithm_parameters] = compute_mccf_moments(E);
-[W.M0, W.M1, W.M2, W.algorithm_parameters] = compute_mccf_moments(W);
-[S.M0, S.M1, S.M2, S.algorithm_parameters] = compute_mccf_moments(S);
-[V.M0, V.M1, V.M2, V.algorithm_parameters] = compute_mccf_moments(V);
+[N.M0, N.M1, N.M2, N.algorithm_parameters] = mccf.compute_mccf_moments(N);
+[E.M0, E.M1, E.M2, E.algorithm_parameters] = mccf.compute_mccf_moments(E);
+[W.M0, W.M1, W.M2, W.algorithm_parameters] = mccf.compute_mccf_moments(W);
+[S.M0, S.M1, S.M2, S.algorithm_parameters] = mccf.compute_mccf_moments(S);
+[V.M0, V.M1, V.M2, V.algorithm_parameters] = mccf.compute_mccf_moments(V);
 
 N.M1 = medfilt1(N.M1, 5);
 E.M1 = medfilt1(E.M1, 5);
@@ -50,7 +50,7 @@ W.M1 = medfilt1(W.M1, 5);
 S.M1 = medfilt1(S.M1, 5);
 V.M1 = medfilt1(V.M1, 5);
 
-h = compute_height_ranges(...
+h = utils.compute_height_ranges(...
 	h_start,...
 	h_end,...
 	N.m_sNumOfRangeBins ...
