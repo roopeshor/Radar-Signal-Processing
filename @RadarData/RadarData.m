@@ -3,8 +3,8 @@ classdef RadarData
 	%
 	%   Each instance holds the 1024-byte binary header fields parsed by
 	%   read_raw_file, the raw complex IQ BeamData cube, and optional
-	%   post-processing fields populated by process_beams.
-	%   See also read_raw_file, process_beams, compute_spectra_from_beam_data
+	%   post-processing fields populated by add_reference_data.
+	%   See also read_raw_file, add_reference_data, compute_simple_spectra
 
 	properties
 		m_sMagicNumber               (1, 1) double  % file magic number (expected: 369)
@@ -65,7 +65,7 @@ classdef RadarData
 
 		% ---- aliases -------------
 		ipp_us                        (1,1) double  % m_fIntrPulsePeriod_us
-		n_coh                         (1,1) double  % m_sNumOfInCohIntegrations
+		n_coh                         (1,1) double  % m_sNumOfCohIntegrations
 		start_height                  (1,1) double  % m_fWindow1StartHeight
 		end_height                    (1,1) double  % m_fWindow1EndHeight
 
@@ -80,6 +80,9 @@ classdef RadarData
 		M0                           (:, 1) double
 		M1                           (:, 1) double
 		M2                           (:, 1) double
+
+		algorithm_parameters                struct  % struct to store algorithm specific parameters like cost function scores
+
 		% ---- reference data ---------
 		filepath                            string  % filepath of raw data
 		ref_height                   (:, 1) double  % given height of reference

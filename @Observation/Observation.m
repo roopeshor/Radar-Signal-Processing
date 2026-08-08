@@ -21,6 +21,8 @@ classdef Observation
 		ref_V (:, 1) double
 		ref_W (:, 1) double
 
+		DBS_Factor_H (1, 1) double
+		DBS_Factor_V (1, 1) double
 	end
 
 	methods
@@ -28,16 +30,22 @@ classdef Observation
 			arguments
 				basename string
 			end
-			beams = process_beams(read_raw_file(basename + ".raw"), add_mmts=true);
+			raw = read_raw_file(basename + ".raw");
+			out = add_reference_data(raw, add_mmts=true, add_uvw=true);
 			[~, obj.observation_name, ~] = fileparts(basename);
 
-			obj.north = beams.north;
-			obj.east = beams.east;
-			obj.west = beams.west;
-			obj.south = beams.south;
-			obj.vertical = beams.vertical;
+			obj.north = out.beam_struct.north;
+			obj.east = out.beam_struct.east;
+			obj.west = out.beam_struct.west;
+			obj.south = out.beam_struct.south;
+			obj.vertical = out.beam_struct.vertical;
+			obj.DBS_Factor_H = compute_dbs_factor(obj.north.m_fOffZenith);
+			obj.DBS_Factor_V = compute_dbs_factor(obj.vertical.m_fOffZenith);
 
-			[obj.ref_height, obj.ref_U, obj.ref_V, obj.ref_W] = read_uvw(basename + "_W1.uvw");
+			obj.ref_height = out.height;
+			obj.ref_U = out.U;
+			obj.ref_V = out.V;
+			obj.ref_W = out.W;
 
 		end
 	end

@@ -15,7 +15,11 @@ function out_beam = compute_beam_moments(beam)
 	n_coh = beam.n_coh;
 	[height_bins, nfft] = size(beam.spectra);
 
-	P_filtered = beam.spectra;
+	if ~isempty(beam.denoised_spectra)
+		P_filtered = beam.denoised_spectra;
+	else
+		P_filtered = beam.spectra;
+	end
 
 	M0 = zeros(1, height_bins);
 	M1 = zeros(1, height_bins);

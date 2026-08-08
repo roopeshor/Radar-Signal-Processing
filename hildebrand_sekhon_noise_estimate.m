@@ -30,7 +30,7 @@ function noise_level = hildebrand_sekhon_noise_estimate(spectrums, M)
 	%   ---------------
 	%     spectrums - Normalised power spectrum matrix.
 	%                 Each row is the Doppler spectrum for one range bin, as
-	%                 returned by compute_spectra_from_beam_data before noise subtraction.
+	%                 returned by compute_simple_spectra before noise subtraction.
 	%     M         - Number of incoherent integrations used
 	%                 when acquiring the spectra.  Scales Q_n to account for
 	%                 the reduced variance after averaging.
@@ -40,7 +40,7 @@ function noise_level = hildebrand_sekhon_noise_estimate(spectrums, M)
 	%     noise_level - double (height_bins x 1).  Estimated mean noise power per
 	%                   Doppler bin for each range bin.
 	%
-	%   See also compute_spectra_from_beam_data, compute_beam_moments
+	%   See also compute_simple_spectra, compute_beam_moments
 
 	arguments
 		spectrums (:, 1024) double

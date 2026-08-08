@@ -10,7 +10,7 @@ function Header = read_raw_file(filepath)
 %                the 1024-byte header fields and a complex BeamData
 %                cube (RangeBins × NFFT × InCohIntegrations).
 %
-%   See also RadarData, process_beams
+%   See also RadarData, add_reference_data
 FileName = filepath;
 fPtr = fopen(FileName, 'rb');
 if fPtr == -1
@@ -113,7 +113,7 @@ for beam_No = 1:beam_count
 
 	% aliases:
 	Header(beam_No).ipp_us = Header(beam_No).m_fIntrPulsePeriod_us;
-	Header(beam_No).n_coh = Header(beam_No).m_sNumOfInCohIntegrations;
+	Header(beam_No).n_coh = Header(beam_No).m_sNumOfCohIntegrations;
 	Header(beam_No).start_height = Header(beam_No).m_fWindow1StartHeight;
 	Header(beam_No).end_height = Header(beam_No).m_fWindow1EndHeight;
 

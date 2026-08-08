@@ -1,4 +1,4 @@
-function out_beam = denoise_beam(beam)
+function denoised_spectra = denoise_beam(beam)
 	%denoise_beam denoises beam using hildebrand sekhon method.
 	% alternatively, modify line 9 to implement own noise estimator
 	% This function should return modified beam and output should be
@@ -16,6 +16,4 @@ function out_beam = denoise_beam(beam)
 
 	% zero the negative
 	denoised_spectra(denoised_spectra < 0) = 0;
-	out_beam = beam;
-	out_beam.denoised_spectra = denoised_spectra;
 end

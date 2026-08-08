@@ -1,0 +1,209 @@
+{
+    "_schemaVersion": "1.0.0",
+
+    "read_raw_file": {
+        "inputs": [
+            {
+                "name": "filepath",
+                "kind": "required",
+                "type": [["string"]],
+                "purpose": "Absolute or relative path to the binary radar data file (.raw) to read."
+            }
+        ],
+        "outputs": [
+            {
+                "name": "Header",
+                "type": [["RadarData"]],
+                "purpose": "RadarData array (1 × beam_count). Each element holds the 1024-byte header fields and a 3-D BeamData array (RangeBins × NFFT × InCohIntegrations) of complex IQ samples."
+            }
+        ]
+    },
+
+    "add_reference_data": {
+        "inputs": [
+            {
+                "name": "filepath",
+                "kind": "required",
+                "type": [["RadarData"]],
+                "purpose": "RadarData array from read_raw_file"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "structure",
+                "type": [["struct"]],
+                "purpose": "Scalar struct with fields vertical, north, west, south, east. Each field holds a RadarData element augmented with direction, denoised_spectra, spectra, and noise_level fields."
+            }
+        ]
+    },
+
+    "compute_simple_spectra": {
+        "inputs": [
+            {
+                "name": "raw_data_matrix",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "3-D complex array (RangeBins × NFFT × InCohIntegrations) of raw IQ samples, as stored in Header(i).BeamData by read_raw_file."
+            }
+        ],
+        "outputs": [
+            {
+                "name": "denoised_spectra",
+                "type": [["double"]],
+                "purpose": "2-D real array (RangeBins × NFFT). Normalised power spectrum with estimated noise floor subtracted (negative values clamped to zero)."
+            },
+            {
+                "name": "spectra",
+                "type": [["double"]],
+                "purpose": "2-D real array (RangeBins × NFFT). Incoherently averaged, normalised power spectrum before noise subtraction."
+            },
+            {
+                "name": "noise_level",
+                "type": [["double"]],
+                "purpose": "Column vector (RangeBins × 1). Per-range-bin noise floor estimate produced by hildebrand_sekhon_noise_estimate."
+            }
+        ]
+    },
+
+    "hildebrand_sekhon_noise_estimate": {
+        "inputs": [
+            {
+                "name": "spectrums",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "2-D real power spectrum array (RangeBins × NFFT). Each row is the Doppler spectrum for one height bin, as returned by compute_simple_spectra."
+            },
+            {
+                "name": "M",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "Scalar. Number of incoherent integrations used when acquiring the spectrum; scales the Hildebrand–Sekhon R_n statistic."
+            }
+        ],
+        "outputs": [
+            {
+                "name": "noise_level",
+                "type": [["double"]],
+                "purpose": "Column vector (RangeBins × 1). Estimated mean noise power per Doppler bin for each range bin."
+            }
+        ]
+    },
+
+    "compute_beam_moments": {
+        "inputs": [
+            {
+                "name": "denoised_spectrum",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "2-D real array (RangeBins × NFFT). Noise-subtracted, normalised power spectrum, as returned in the first output of compute_simple_spectra."
+            },
+            {
+                "name": "ipp_us",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "Scalar. Inter-Pulse Period in microseconds (Header(i).m_fIntrPulsePeriod_us). Used to derive the effective sampling time and Doppler frequency spacing."
+            },
+            {
+                "name": "n_coh",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "Scalar. Number of coherent integrations (Header(i).m_sNumOfCohIntegrations). Multiplied with ipp_us to obtain the effective sampling time T_eff."
+            }
+        ],
+        "outputs": [
+            {
+                "name": "M0",
+                "type": [["double"]],
+                "purpose": "Column vector (RangeBins × 1). Zeroth moment — total signal power per height bin (integral of the spectrum)."
+            },
+            {
+                "name": "M1",
+                "type": [["double"]],
+                "purpose": "Column vector (RangeBins × 1). First moment — mean Doppler frequency (Hz) per height bin."
+            },
+            {
+                "name": "M2",
+                "type": [["double"]],
+                "purpose": "Column vector (RangeBins × 1). Second moment — Doppler spectral width (variance in Hz²) per height bin."
+            }
+        ]
+    },
+
+    "get_beam_direction": {
+        "inputs": [
+            {
+                "name": "azimuth",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "Scalar. Beam azimuth angle in degrees (Header(i).m_fAzimuth). 0 = north, 90 = west, 180 = south, 270 = east."
+            },
+            {
+                "name": "offZenith",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "Scalar. Off-zenith angle in degrees (Header(i).m_fOffZenith). 0 indicates a vertically pointing beam."
+            }
+        ],
+        "outputs": [
+            {
+                "name": "dir_str",
+                "type": [["char"]],
+                "purpose": "Human-readable beam direction label: 'vertical', 'north', 'west', 'south', 'east', or 'Unknown'."
+            }
+        ]
+    },
+
+    "visualize_spectra": {
+        "inputs": [
+            {
+                "name": "beams",
+                "kind": "required",
+                "type": [["struct"]],
+                "purpose": "Struct array of beam elements (e.g., from add_reference_data). Each element must contain BeamData, m_fIntrPulsePeriod_us, m_sNumOfCohIntegrations, m_fWindow1StartHeight, m_fWindow1EndHeight, and direction fields."
+            }
+        ],
+        "outputs": []
+    },
+
+    "read_mmts": {
+        "inputs": [
+            {
+                "name": "path",
+                "kind": "required",
+                "type": [["string"]],
+                "purpose": "Base filename (without the '+.mmts' suffix) of the moments file inside Data/Mode_<mode_>/."
+            },
+            {
+                "name": "mode_",
+                "kind": "namevalue",
+                "type": [["int32"]],
+                "purpose": "Radar operation mode index used to select the subdirectory Data/Mode_<mode_>/. Defaults to 1."
+            }
+        ],
+        "outputs": [
+            {
+                "name": "output",
+                "type": [["table"]],
+                "purpose": "MATLAB table read from the .mmts text file, with original column names preserved. Columns correspond to M0, M1, M2, SNR, and noise level per range bin."
+            }
+        ]
+    },
+
+    "validate_mmts": {
+        "inputs": [
+            {
+                "name": "in_mmts",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "Reference moments matrix loaded from a .mmts file (via read_mmts). Columns: [M0 (dBm), M1 (Hz), M2 (Hz), SNR (dB), Noise Level (dBm)]."
+            },
+            {
+                "name": "computed_mmts",
+                "kind": "required",
+                "type": [["double"]],
+                "purpose": "Computed moments matrix in the same column layout as in_mmts, derived from compute_beam_moments and the noise estimates."
+            }
+        ],
+        "outputs": []
+    }
+}
