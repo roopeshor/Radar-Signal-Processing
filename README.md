@@ -11,11 +11,16 @@ The `run.m` is entry file. All functions to a particular class of algorithm (met
 │
 │                               ┐
 ├── +mccf                       │
-│   ├── compute_moments.m       │
+│   ├── compute_all_moments.m   │
+│   └── compute_all_spectra.m   │
+│   └── compute_moments.m       │
 │   └── compute_spectra.m       │
 ├── +simple                     │
-│   ├── compute_moments.m       ├─── Methods
+│   ├── compute_all_moments.m   ├─── Methods
+│   ├── compute_all_spectra.m   │
+│   ├── compute_moments.m       │
 │   ├── compute_spectra.m       │
+│   ├── denoise_all_beams.m     │
 │   ├── denoise_beam.m          │
 │   └── HS_noise_estimate.m     │
 │                               ┘
