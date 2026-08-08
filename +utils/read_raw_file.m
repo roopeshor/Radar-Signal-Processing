@@ -11,6 +11,14 @@ function Header = read_raw_file(filepath)
 %                cube (RangeBins × NFFT × InCohIntegrations).
 %
 %   See also RadarData, add_reference_data
+
+arguments (Input)
+	filepath (1,1) string
+end
+arguments (Output)
+	Header RadarData
+end
+
 FileName = filepath;
 fPtr = fopen(FileName, 'rb');
 if fPtr == -1
@@ -109,7 +117,7 @@ for beam_No = 1:beam_count
 	Header(beam_No).direction = utils.get_beam_direction(...
 		Header(beam_No).m_fAzimuth, ...
 		Header(beam_No).m_fOffZenith ...
-	);
+		);
 
 	% aliases:
 	Header(beam_No).ipp_us = Header(beam_No).m_fIntrPulsePeriod_us;

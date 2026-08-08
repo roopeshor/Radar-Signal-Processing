@@ -10,9 +10,12 @@ function max_velocity = compute_max_velocity(ipp, incoh)
 	%   Output Arguments:
 	%     max_velocity - Maximum unambiguous Doppler velocity (m/s).
 
-	arguments
+	arguments (Input)
 		ipp (1,1) double % Inter Pulse Period in microseconds
 		incoh (1,1) double = 1 % number of incoherent integrations
+	end
+	arguments (Output)
+		max_velocity (1,1) double
 	end
 	radarFreq = 205e6;
 	c = 299792458.0;

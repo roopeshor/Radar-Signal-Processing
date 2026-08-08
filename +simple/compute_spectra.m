@@ -1,39 +1,42 @@
 function spectra = compute_spectra(beam)
-	arguments
-		beam RadarData  % double complex (RangeBins × NFFT × InCohIntegrations)
-		% options.window function_handle = @hann
-	end
 
-	% compute_spectra Most simplest spectra computer.
-	%
-	%   Input Arguments:
-	%       beam - obtained from read_raw_file
-	%       options.window - window function used (default: hann)
-	%   Output Arguments:
-	%       spectra - normalized power spectra of each height (column vector)
+arguments (Input)
+	beam RadarData
+end
+arguments (Output)
+	spectra (:, 1024) double  % (RangeBins × NFFT)
+end
 
-	% [~, nfft, ~] = size(beam.BeamData);
+% compute_spectra Most simplest spectra computer.
+%
+%   Input Arguments:
+%       beam - obtained from read_raw_file
+%       options.window - window function used (default: hann)
+%   Output Arguments:
+%       spectra - normalized power spectra of each height (column vector)
 
-	% DC Removal (Subtract the mean along the NFFT time axis - which is dim 2)
-	beamData = beam.BeamData - mean(beam.BeamData, 2);
+% [~, nfft, ~] = size(beam.BeamData);
 
-	% Reshape window to match (1, NFFT, 1) for broadcasting
-	% ie, repeats it along height direction
-	% window_reshaped = reshape(window(nfft), [1, nfft, 1]);
-	% beamData = beamData .* window_reshaped;
+% DC Removal (Subtract the mean along the NFFT time axis - which is dim 2)
+beamData = beam.BeamData - mean(beam.BeamData, 2);
 
-	% FFT along dimension 2
-	spectraCube = fft(beamData, [], 2);
+% Reshape window to match (1, NFFT, 1) for broadcasting
+% ie, repeats it along height direction
+% window_reshaped = reshape(window(nfft), [1, nfft, 1]);
+% beamData = beamData .* window_reshaped;
 
-	% Calculate Power Spectrum (Magnitude squared)
-	spectraCube = abs(fftshift(spectraCube, 2)) .^ 2;
+% FFT along dimension 2
+spectraCube = fft(beamData, [], 2);
 
-	% Incoherent Integration (Average across the InCoh axis - dim 3)
-	spectraCube = mean(spectraCube, 3);
+% Calculate Power Spectrum (Magnitude squared)
+spectraCube = abs(fftshift(spectraCube, 2)) .^ 2;
 
-	% Squeeze to remove InCoh axis, and make spectra a 2D array
-	spectra = squeeze(spectraCube);
+% Incoherent Integration (Average across the InCoh axis - dim 3)
+spectraCube = mean(spectraCube, 3);
 
-	% normalize
-	spectra = spectra / max(spectra(:));
+% Squeeze to remove InCoh axis, and make spectra a 2D array
+spectra = squeeze(spectraCube);
+
+% normalize
+spectra = spectra / max(spectra(:));
 end

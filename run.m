@@ -3,45 +3,21 @@ disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
 
+%% old method
+obs = simple.compute_all_spectra(obs);
+obs = simple.denoise_all_beams(obs);
+obs = simple.compute_all_moments(obs);
+
+%% MCCF Method
+obs = mccf.compute_all_spectra(obs);
+% obs = simple.denoise_all_beams(obs);
+% obs = mccf.compute_all_moments(obs);
+
 N = obs.north;
 S = obs.south;
 E = obs.east;
 W = obs.west;
 V = obs.vertical;
-
-%% old method
-% N.spectra = simple.compute_spectra(N);
-% S.spectra = simple.compute_spectra(S);
-% E.spectra = simple.compute_spectra(E);
-% W.spectra = simple.compute_spectra(W);
-% V.spectra = simple.compute_spectra(V);
-% N.denoised_spectra = simple.denoise_beam(N);
-% S.denoised_spectra = simple.denoise_beam(S);
-% E.denoised_spectra = simple.denoise_beam(E);
-% W.denoised_spectra = simple.denoise_beam(W);
-% V.denoised_spectra = simple.denoise_beam(V);
-% N = simple.compute_moments(N);
-% E = simple.compute_moments(E);
-% W = simple.compute_moments(W);
-% S = simple.compute_moments(S);
-% V = simple.compute_moments(V);
-
-%% MCCF Method
-N.spectra = mccf.compute_spectra(N);
-S.spectra = mccf.compute_spectra(S);
-E.spectra = mccf.compute_spectra(E);
-W.spectra = mccf.compute_spectra(W);
-V.spectra = mccf.compute_spectra(V);
-N.denoised_spectra = N.spectra;
-S.denoised_spectra = S.spectra;
-E.denoised_spectra = E.spectra;
-W.denoised_spectra = W.spectra;
-V.denoised_spectra = V.spectra;
-N = mccf.compute_moments(N);
-E = mccf.compute_moments(E);
-W = mccf.compute_moments(W);
-S = mccf.compute_moments(S);
-V = mccf.compute_moments(V);
 
 %% Doppler Spectra and Moments
 figure("Name", "Spectra");
@@ -65,6 +41,7 @@ h = utils.compute_height_ranges(...
 	h_end,...
 	N.m_sNumOfRangeBins ...
 );
+
 
 visualize_spectra(...
 	N.denoised_spectra, ...

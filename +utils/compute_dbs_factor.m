@@ -1,12 +1,15 @@
 function factor = compute_dbs_factor(off_zenith_angle)
-	% compute_dbs_factor calculates the scaling factor to convert 
+	% compute_dbs_factor calculates the scaling factor to convert
 	% Doppler frequencies (Hz) into wind velocities (m/s).
-	% 
+	%
 	% For vertical beams (0 degrees), it returns the radial velocity factor.
 	% For off-zenith beams, it returns the horizontal DBS geometric factor.
 
-	arguments
+	arguments (Input)
 		off_zenith_angle (1,1) double
+	end
+	arguments (Output)
+		factor (1,1) double
 	end
 
 	radarFreq = 205e6;
