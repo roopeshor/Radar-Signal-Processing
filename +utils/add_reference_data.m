@@ -44,52 +44,49 @@ for i = 1:5
 			beam.ref_M2 = [];
 			beam.ref_SNR = [];
 			beam.ref_noise_level = [];
-			return;
+		else
+			output = readtable( ...
+				path, ...
+				FileType='text', ...
+				VariableNamingRule='preserve' ...
+				);
+			beam.ref_height = output.("Height (km)");
+			beam.ref_M0 = output.("M0 Total Power(dBm)");
+			beam.ref_M1 = output.("M1 Mean Doppler (Hz)");
+			beam.ref_M2 = output.("M2 Doppler Spread (Hz)");
+			beam.ref_SNR = output.("SNR (dB)");
+			beam.ref_noise_level = output.("Noise Level (dBm)");
+
 		end
-
-		output = readtable( ...
-			path, ...
-			FileType='text', ...
-			VariableNamingRule='preserve' ...
-			);
-		beam.ref_height = output.("Height (km)");
-		beam.ref_M0 = output.("M0 Total Power(dBm)");
-		beam.ref_M1 = output.("M1 Mean Doppler (Hz)");
-		beam.ref_M2 = output.("M2 Doppler Spread (Hz)");
-		beam.ref_SNR = output.("SNR (dB)");
-		beam.ref_noise_level = output.("Noise Level (dBm)");
-
-	end
-	beam_struct.(direction) = beam;
-end
-
-%% UVW
-height = [];
-U = [];
-V = [];
-W = [];
-path = fullfile(folder, basename + options.uvw_file_ext);
-if options.add_uvw
-	if ~isfile(path)
-		warning(path + " not found, returning empty array");
-		return;
+		beam_struct.(direction) = beam;
 	end
 
-	output = readtable( ...
-		path, ...
-		FileType='text', ...
-		VariableNamingRule='preserve' ...
+	%% UVW
+	height = [];
+	U = [];
+	V = [];
+	W = [];
+	path = fullfile(folder, basename + options.uvw_file_ext);
+	if options.add_uvw
+		if ~isfile(path)
+			warning(path + " not found, returning empty array");
+		else
+			output = readtable( ...
+				path, ...
+				FileType='text', ...
+				VariableNamingRule='preserve' ...
+				);
+			height = output.("Height (km)");
+			U = output.("Zonal(U) (m/s)");
+			V = output.("Meridional(V) (m/s)");
+			W = output.("Vertical (W) (m/s)");
+		end
+	end
+	out = struct(...
+		"beam_struct", beam_struct,...
+		"U", U,...
+		"V", V,...
+		"W", W,...
+		"height", height ...
 		);
-	height = output.("Height (km)");
-	U = output.("Zonal(U) (m/s)");
-	V = output.("Meridional(V) (m/s)");
-	W = output.("Vertical (W) (m/s)");
-end
-out = struct(...
-	"beam_struct", beam_struct,...
-	"U", U,...
-	"V", V,...
-	"W", W,...
-	"height", height ...
-	);
 end

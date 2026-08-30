@@ -1,4 +1,4 @@
-filepath = fullfile("Data" , "Mode_2", "EXP_DBS_CH4_01Jun2025_18_04_28");
+filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
@@ -8,8 +8,8 @@ obs = simple.compute_all_spectra(obs);
 obs = simple.denoise_all_beams(obs);
 obs = simple.compute_all_moments(obs);
 
-%% MCCF Method
-obs = mccf.compute_all_spectra(obs);
+% %% MCCF Method
+% obs = mccf.compute_all_spectra(obs);
 % obs = simple.denoise_all_beams(obs);
 % obs = mccf.compute_all_moments(obs);
 
@@ -112,7 +112,7 @@ end
 
 subplot(1,5,idx);
 warning('off', 'MATLAB:log:logOfZero');
-x_bounds = [-max_velocity, max_velocity]/4;
+x_bounds = [-max_velocity, max_velocity];
 imagesc( ...
 	x_bounds, ...
 	[start_height, end_height], ...

@@ -4,9 +4,9 @@ function Header = read_raw_file(filepath)
 %   Header = read_raw_file(filepath)
 %
 %   Input:
-%     filepath – string. Path to the .raw binary radar data file.
+%     filepath - string. Path to the .raw binary radar data file.
 %   Output:
-%     Header   – RadarData array (1 × beam_count). Each element holds
+%     Header   - RadarData array (1 × beam_count). Each element holds
 %                the 1024-byte header fields and a complex BeamData
 %                cube (RangeBins × NFFT × InCohIntegrations).
 %
