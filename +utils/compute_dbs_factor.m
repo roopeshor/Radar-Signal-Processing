@@ -12,10 +12,7 @@ function factor = compute_dbs_factor(off_zenith_angle)
 		factor (1,1) double
 	end
 
-	radarFreq = 205e6;
-	c = 299792458.0;
-	wavelength = c / radarFreq;
-	vel_factor = wavelength / 2;
+	vel_factor = 299792458.0 / 205e6 / 2;
 
 	if off_zenith_angle == 0
 		factor = vel_factor;

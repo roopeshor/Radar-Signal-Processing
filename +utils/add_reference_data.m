@@ -1,4 +1,4 @@
-function out = add_reference_data(beams, options)
+function out = add_reference_data(beams, filepath, options)
 % add_reference_data packages moments file corresponding to each beam with RadarData from read_raw_data.
 % Also returns UVW data from corresponding UVW file (if exists)
 %   Input Arguments:
@@ -6,6 +6,7 @@ function out = add_reference_data(beams, options)
 
 arguments (Input)
 	beams (5, 1) RadarData
+	filepath string
 	options.add_mmts = true
 	options.add_uvw = true
 	options.uvw_file_ext = "_W1.uvw"
@@ -30,7 +31,7 @@ beam_struct = struct( ...
 	"east", RadarData() ...
 	);
 
-[folder, basename, ~] = fileparts(beams(1).filepath);
+[folder, basename, ~] = fileparts(filepath);
 for i = 1:5
 	beam = beams(i);
 	direction = beam.direction;
