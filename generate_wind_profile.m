@@ -1,7 +1,7 @@
 function [z, u, v, w] = generate_wind_profile(cfg)
 
 arguments
-    cfg.dz double = 0.15       % [km] range bin resolution
+    cfg.nRangeBins double = 173% [ ] number of range bins
     cfg.max_height double = 32 % [km] max height for which wind profile has to be generated
 
     % Synoptic Background Profile
@@ -62,7 +62,8 @@ arguments
 end
 
 % Height grid configuration (km)
-z = (0:cfg.dz:cfg.max_height)';  % Height vector (0 to 32 km)
+z = linspace(0, cfg.max_height, cfg.nRangeBins)';  % Height vector (0 to 32 km)
+dz = z(2) - z(1);
 z_m = z * 1000;                  % Height in meters
 N = length(z);
 
@@ -130,8 +131,8 @@ end
 
 %% 5. Stable Kolmogorov Turbulence with Log-Normal Intermittency
 % Vertical wind shear (s^-1)
-du_dz = gradient(u_mean, cfg.dz * 1000);
-dv_dz = gradient(v_mean, cfg.dz * 1000);
+du_dz = gradient(u_mean, dz * 1000);
+dv_dz = gradient(v_mean, dz * 1000);
 shear_sq = du_dz.^2 + dv_dz.^2 + 1e-8; % 1e-8 prevents division by zero
 
 % Gradient Richardson Number (Ri)
@@ -139,10 +140,10 @@ Ri = (cfg.lw_N_bv^2) ./ shear_sq;
 turb_boost = cfg.kt_bf + cfg.kt_maxT * (Ri < cfg.kt_Ric) .* exp(-((z - cfg.kt_tlpeak)/cfg.kt_vthick).^2);
 
 % Spatial wavenumber vector for 1D Fourier spectral filtering.
-k_vec = [(0:floor(N/2)), (-floor((N-1)/2):-1)]' / (N * cfg.dz);
+k_vec = [(0:floor(N/2)), (-floor((N-1)/2):-1)]' / (N * dz);
 
 % Fundamental spatial frequency floor preventing low-frequency filter blowup.
-k_min = 1 / (N * cfg.dz);
+k_min = 1 / (N * dz);
 k_abs = max(abs(k_vec), k_min);
 
 % Amplitude shaping filter (k^(-5/6) yields k^(-5/3) power spectrum when squared)

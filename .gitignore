@@ -1,3 +1,6 @@
 Data
 .vscode
 noupload
+test*.m
+**/*.csv
+plots

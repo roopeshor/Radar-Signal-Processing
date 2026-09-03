@@ -2,19 +2,15 @@
 % Synthesizes raw ST Radar data from a prescribed wind profile
 % and then runs the standard spectrum and moments processing pipeline.
 
-basename = fullfile("Data", "other", "simulated_data");
+basename = fullfile("Data", "Mode_1", "EXP_DBS_CH4_01Jun2025_10_42_31");
 disp("Synthesizing data to: " + basename);
 
 % 1. Prescribe a wind profile
 nRangeBins = 173;
-% Generate some synthetic wind shears
-% u = linspace(20, -5, nRangeBins)';
-% v = linspace(-5, 25, nRangeBins)';
-% w = 3 * sin(linspace(0, 4*pi, nRangeBins))';
-[z, u, v, w] = generate_wind_profile();
+[z, u, v, w] = generate_wind_profile(nRangeBins=nRangeBins);
 
 % 2. Synthesize Raw Data and load Observation object
-obs = Observation.synthetic(basename, u, v, w, nRangeBins=length(z));
+obs = Observation.synthetic(u, v, w);
 % obs = Observation(basename);
 % 3. Process Spectra and Moments
 disp("Computing Spectra...");
@@ -52,12 +48,12 @@ h = utils.compute_height_ranges(...
 	N.m_sNumOfRangeBins ...
 );
 
-visualize_spectra(N.denoised_spectra, {N.M1 * obs.DBS_Factor_V, N.ref_M1}, 1, "North", h, vmax, h_start, h_end)
-visualize_spectra(S.denoised_spectra, {S.M1 * obs.DBS_Factor_V, S.ref_M1}, 2, "South", h, vmax, h_start, h_end)
-visualize_spectra(E.denoised_spectra, {E.M1 * obs.DBS_Factor_V, E.ref_M1}, 3, "East", h, vmax, h_start, h_end)
-visualize_spectra(W.denoised_spectra, {W.M1 * obs.DBS_Factor_V, W.ref_M1}, 4, "West", h, vmax, h_start, h_end)
-visualize_spectra(V.denoised_spectra, {V.M1 * obs.DBS_Factor_V, V.ref_M1}, 5, "Vertical", h, vmax, h_start, h_end)
-
+visualize_spectra(N.spectra, {N.M1 * obs.DBS_Factor_V, N.ref_M1}, 1, "North", h, vmax, h_start, h_end)
+visualize_spectra(S.spectra, {S.M1 * obs.DBS_Factor_V, S.ref_M1}, 2, "South", h, vmax, h_start, h_end)
+visualize_spectra(E.spectra, {E.M1 * obs.DBS_Factor_V, E.ref_M1}, 3, "East", h, vmax, h_start, h_end)
+visualize_spectra(W.spectra, {W.M1 * obs.DBS_Factor_V, W.ref_M1}, 4, "West", h, vmax, h_start, h_end)
+visualize_spectra(V.spectra, {V.M1 * obs.DBS_Factor_V, V.ref_M1}, 5, "Vertical", h, vmax, h_start, h_end)
+colorbar;
 %% UVW Wind Vector Plotting
 figure("Name", "UVW")
 plot_compared_ref((E.M1 - W.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
