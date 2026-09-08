@@ -29,10 +29,7 @@ V = obs.vertical;
 %% Doppler Spectra and Moments Plotting
 figure("Name", "Spectra");
 
-vmax = utils.compute_max_velocity(...
-	N.m_fIntrPulsePeriod_us, ...
-	N.m_sNumOfCohIntegrations ...
-);
+vmax = obs.v_max;
 h_start = N.start_height / 1000;
 h_end = N.end_height / 1000;
 

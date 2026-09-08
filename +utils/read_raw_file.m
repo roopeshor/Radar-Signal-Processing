@@ -39,7 +39,7 @@ if isempty(beam_count) || beam_count <= 0
 end
 
 % Preallocate RadarData array
-Header(beam_count) = RadarData();
+Header = RadarData.empty(0, 5);
 
 for beam_No = 1:beam_count
 	hdrBytes = fread(fPtr, 1024, 'uint8=>uint8');
@@ -112,9 +112,9 @@ for beam_No = 1:beam_count
 	Header(beam_No).m_fWindow5StartHeight        = double(typecast(hdrBytes(725:728), 'single'));
 	Header(beam_No).m_fWindow5EndHeight          = double(typecast(hdrBytes(729:732), 'single'));
 
-	Header(beam_No).direction = utils.get_beam_direction(...
-		Header(beam_No).m_fAzimuth, ...
-		Header(beam_No).m_fOffZenith ...
+	Header(beam_No).direction = Data.aoz2dir(...
+		az=Header(beam_No).m_fAzimuth, ...
+		oz=Header(beam_No).m_fOffZenith ...
 		);
 
 	% aliases:

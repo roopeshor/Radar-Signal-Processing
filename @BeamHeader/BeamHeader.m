@@ -62,11 +62,14 @@ classdef BeamHeader
 			arguments
 				cfg = struct()
 			end
+
 			% apply given data if its beamheader or struct
 			if class(cfg) == "BeamHeader" || class(cfg) == "struct"
-				fn = fieldnames(cfg);
-				for i = 1:length(fn)
-					obj.(fn{i}) = cfg.(fn{i});
+				bhf = properties("BeamHeader");
+				for i = 1:length(bhf)
+					if isfield(cfg, bhf{i}) || isprop(cfg, bhf{i})
+						obj.(bhf{i}) = cfg.(bhf{i});
+					end
 				end
 			end
 		end

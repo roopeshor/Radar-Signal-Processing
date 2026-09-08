@@ -1,16 +1,22 @@
-filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15");
+% filepath = fullfile("Data/other/EXP_DBS_CH4_29Jul2026_19_21_31");
+% filepath = fullfile("Data/other/EXP_DBS_CH4_29Jul2026_19_20_07");
+filepath = fullfile("Data/other/EXP_DBS_CH4_29Jul2026_19_17_20");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
 
-%% old method
-obs = mccf.compute_all_spectra(obs);
-obs = simple.denoise_all_beams(obs);
-obs = simple.compute_all_moments(obs);
+% % old method
+% obs = simple.compute_all_spectra(obs);
+% obs = simple.denoise_all_beams(obs);
+% obs = simple.compute_all_moments(obs);
 
-% %% MCCF Method
+% MCCF Method
 % obs = mccf.compute_all_spectra(obs);
 % obs = simple.denoise_all_beams(obs);
+% obs = mccf.compute_all_moments(obs);
+
+obs = st.compute_all_spectra(obs);
+obs = st.compute_all_moments(obs);
 % obs = mccf.compute_all_moments(obs);
 
 N = obs.north;
@@ -19,12 +25,11 @@ E = obs.east;
 W = obs.west;
 V = obs.vertical;
 
-vmax = utils.compute_max_velocity(N.ipp_us, N.n_coh);
 h_start = N.start_height / 1000;
 h_end = N.end_height / 1000;
 
 %% Doppler Spectra and Moments
-figure("Name", "Spectra");
+% figure("Name", "Spectra");
 
 N.M1 = medfilt1(N.M1, 5);
 E.M1 = medfilt1(E.M1, 5);
@@ -32,50 +37,33 @@ W.M1 = medfilt1(W.M1, 5);
 S.M1 = medfilt1(S.M1, 5);
 V.M1 = medfilt1(V.M1, 5);
 
-h = utils.compute_height_ranges(...
-	h_start,...
-	h_end,...
-	N.m_sNumOfRangeBins ...
-	);
+h = utils.compute_height_ranges(h_start, h_end, N.m_sNumOfRangeBins);
 
+dirs = [N,S,W,E,V];
 
-visualize_spectra(...
-	N.denoised_spectra, ...
-	{N.M1 * obs.DBS_Factor_V, N.ref_M1}, ...
-	1, "North", ...
-	h, vmax, h_start, h_end ...
-	)
-visualize_spectra(...
-	S.denoised_spectra, ...
-	{S.M1 * obs.DBS_Factor_V, S.ref_M1}, ...
-	2, "South", ...
-	h, vmax, h_start, h_end ...
-	)
-visualize_spectra(...
-	E.denoised_spectra, ...
-	{E.M1 * obs.DBS_Factor_V, E.ref_M1}, ...
-	3, "East", ...
-	h, vmax, h_start, h_end ...
-	)
-visualize_spectra(...
-	W.denoised_spectra, ...
-	{W.M1 * obs.DBS_Factor_V, W.ref_M1}, ...
-	4, "West", ...
-	h, vmax, h_start, h_end ...
-	)
-visualize_spectra(...
-	V.denoised_spectra, ...
-	{V.M1 * obs.DBS_Factor_V, V.ref_M1}, ...
-	5, "Vertical", ...
-	h, vmax, h_start, h_end ...
-	)
+for i = 1:5
+	d = dirs(i);
+	subplot(1, 5, i);
+	utils.plot_doppler_spectra(...
+		spectra   = log10(d.spectra),   ...
+		comp_m    = d.M1 * obs.DBS_Factor_V,     ...
+		ref_m     = d.ref_M1 * obs.DBS_Factor_V, ...
+		direction = d.direction,                 ...
+		heights   = h,                           ...
+		x_max     = obs.v_max                    ...
+		)
+end
 
-
-%% UVW
+% %% UVW
 figure("Name", "UVW")
-plot_compared_ref((E.M1 - W.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
+plot_compared_ref((W.M1 - E.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
 plot_compared_ref((S.M1 - N.M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
-plot_compared_ref(-V.M1 * obs.DBS_Factor_V, obs.ref_W, 3, h, "Vertical (W)")
+theta = 10;
+c_th = cosd(theta);
+sum_M1 = E.M1 + W.M1 + N.M1 + S.M1;
+calc_W = -obs.DBS_Factor_V * (c_th * sum_M1 + V.M1) / (4 * c_th^2 + 1);
+
+plot_compared_ref(calc_W, obs.ref_W, 3, h, "Vertical (W)")
 
 
 %% Functions
@@ -92,39 +80,4 @@ xlabel("wind velocity (m/s)")
 ylabel("height (km)")
 title(title_);
 legend(["ref", "calc"]);
-end
-
-function visualize_spectra(spectra, M1s, idx, direction, heights, max_velocity, start_height, end_height)
-arguments
-	spectra (:, 1024) double
-	M1s (1, :) cell
-	idx double
-	direction string
-	heights (:, 1) double
-	max_velocity = 30
-	start_height = 0 % in km
-	end_height = 8 % in km
-end
-
-subplot(1,5,idx);
-warning('off', 'MATLAB:log:logOfZero');
-x_bounds = [-max_velocity, max_velocity];
-imagesc( ...
-	x_bounds, ...
-	[start_height, end_height], ...
-	10 * log10(spectra) ...
-	);
-hold on;
-plot(M1s{1}, heights, 'w-', 'LineWidth', 1, 'Color', "red");
-plot(M1s{2}, heights, 'w-', 'LineWidth', 1, 'Color', "black");
-xlim(x_bounds);
-hold off;
-set(gca, 'YDir', 'normal');
-colormap('Parula');
-
-% 3. Plot to the second axes
-xlabel('Doppler Velocity (m/s)');
-ylabel('Altitude (km)');
-title(direction);
-
 end

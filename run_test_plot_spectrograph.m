@@ -7,14 +7,12 @@ obs = Observation(filepath);
 obs = mccf.compute_all_spectra(obs);
 % obs = simple.denoise_all_beams(obs);
 
-vmax = utils.compute_max_velocity(obs.north.ipp_us, obs.north.n_coh);
 data = obs.west.spectra;
 h_start = obs.north.start_height / 1000;
 h_end = obs.north.end_height / 1000;
 [h,x] = size(data);
-x_ticks = linspace(-vmax, vmax, x);
-y_ticks = linspace(h_start, h_end, h)
-;
+x_ticks = linspace(-obs.v_max, obs.v_max, x);
+y_ticks = linspace(h_start, h_end, h);
 stacked_spectrogram((data/max(data, [], 'all')), ...
 	y_ticks, x_ticks, ...
 	plot_gradiated    = true,     ...

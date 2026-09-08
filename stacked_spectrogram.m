@@ -1,12 +1,12 @@
-function stacked_spectrogram(data, y_ticks, x_ticks, cfg)
+function stacked_spectrogram(spectrum, y_ticks, x_ticks, cfg)
 	%stacked_spectrogram  creates a stacked spectrogram.
 	%    It can render plots with single color or gradient according to function value
 	%    Optionally it can also mark max peak in each graph, and a reference line at given point
 
 arguments
-	data (:, :) double
-	y_ticks (1, :) double = linspace(0,1,length(data(:, 1)))
-	x_ticks (1, :) double = linspace(0,1,length(data))
+	spectrum (:, :) double
+	y_ticks (1, :) double = linspace(0,1,length(spectrum(:, 1)))
+	x_ticks (1, :) double = linspace(0,1,length(spectrum))
 
 	% scaling of amplitude of the spectral peaks.
 	cfg.amplitude_scale double = 1.2
@@ -52,30 +52,27 @@ end
 if cfg.decimate_factor > 1
 	% Decimate the horizontal data before constructing the blocks
 	x_ticks = x_ticks(1:cfg.decimate_factor:end);
-	data = data(:, 1:cfg.decimate_factor:end);
+	spectrum = spectrum(:, 1:cfg.decimate_factor:end);
 end
 
 %%% Amplitude scaling.
 % This finds the correct scale so that a waveform entirely fits in its given y range. amplitude_scaling does further scaling
 plot_dy = y_ticks(2) - y_ticks(1); % assume uniform tick size
-data(isinf(data)) = NaN;
-[y_max, y_max_idx] = max(data, [], 2, 'omitnan');
-y_min  = min(data, [], 2, 'omitnan');
+spectrum(isinf(spectrum)) = NaN;
+[y_max, y_max_idx] = max(spectrum, [], 2, 'omitnan');
+y_min  = min(spectrum, [], 2, 'omitnan');
 y_diff_max = max(y_max - y_min);
 cfg.amplitude_scale = cfg.amplitude_scale * plot_dy / y_diff_max;
 
 y_count = length(y_ticks);
-y_stacked_all = y_ticks' + (data * cfg.amplitude_scale);
-
-fig = figure();
-ax = axes(Parent=fig, SortMethod='childorder');
-hold(ax, 'on');
+y_stacked_all = y_ticks' + (spectrum * cfg.amplitude_scale);
 
 if cfg.baseline_thick > 0
 	X_base = repmat([x_ticks(1); x_ticks(end); NaN], y_count, 1);
 	Y_base = reshape([y_ticks; y_ticks; NaN(1, y_count)], [], 1);
-	plot(ax, X_base, Y_base, Color=cfg.baseline_color, LineWidth=cfg.baseline_thick);
+	plot(X_base, Y_base, Color=cfg.baseline_color, LineWidth=cfg.baseline_thick);
 end
+hold on;
 
 % Vertical Reference Line at x = 0
 if cfg.ref_line_thick > 0
@@ -90,26 +87,26 @@ X_ticks   = reshape([repmat(x_ticks, y_count, 1), nans]', 1, []);
 Y_stacked = reshape([y_stacked_all, nans]', 1, []);
 
 if cfg.plot_gradiated
-	Y_vals  = reshape([data, nans]', 1, []);
+	Y_vals  = reshape([spectrum, nans]', 1, []);
 
 	X_final = [X_ticks; X_ticks];
 	Y_final = [Y_stacked; Y_stacked];
 	C_final = [Y_vals; Y_vals];
 	Z_final = zeros(size(X_final));
 
-	s = surface(ax, X_final, Y_final, Z_final, C_final, ...
+	s = surface(X_final, Y_final, Z_final, C_final, ...
 		FaceColor='none', ...
 		EdgeColor='interp', ...
 		LineWidth=cfg.plot_thick);
 	s.AlignVertexCenters = 'off';
 
-	colormap(ax, cfg.plot_color);
+	colormap(cfg.plot_color);
 	if cfg.plot_add_colorbar
-		colorbar(ax);
+		colorbar;
 	end
 	view(2);
 else
-	plot(ax, X_ticks, Y_stacked, Color=cfg.plot_color, LineWidth=cfg.plot_thick);
+	plot(X_ticks, Y_stacked, Color=cfg.plot_color, LineWidth=cfg.plot_thick);
 end
 
 % Find and mark the peak (blue triangle)

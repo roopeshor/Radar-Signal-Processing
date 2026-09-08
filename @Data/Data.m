@@ -1,0 +1,81 @@
+classdef Data
+	%           0°
+	%          N[4]
+	%
+	%
+	%  W[2]    V[0]     E[1]
+	%  270°              90°
+	%
+	%          S[3]
+	%          180°
+	properties (Constant)
+		cnt2az = dictionary(...
+			0, 0, ...
+			1, 270, ...
+			2, 90, ...
+			3, 180, ...
+			4, 0 ...
+			);
+		dir2cnt = dictionary(...
+			0, "vertical", ...
+			1, "east", ...
+			2, "west", ...
+			3, "south", ...
+			4, "north" ...
+			);
+
+		az2dir = dictionary(...
+			0, 'north', ...
+			90, 'east', ...
+			180, 'south', ...
+			270, 'west' ...
+			);
+		dir2mmts_file_ext = struct(...
+			"vertical", "_Beam1_W1_Az_0.00_Oz_0.00.mmts", ...
+			"east"    , "_Beam2_W1_Az_90.00_Oz_10.00.mmts", ...
+			"south"   , "_Beam4_W1_Az_180.00_Oz_10.00.mmts", ...
+			"west"    , "_Beam3_W1_Az_270.00_Oz_10.00.mmts", ...
+			"north"   , "_Beam5_W1_Az_0.00_Oz_10.00.mmts" ...
+			);
+	end
+	methods (Static)
+		function az = dir2az(dir)
+			arguments (Input)
+				dir (1,1) string
+			end
+			arguments (Output)
+				az (1,1) double
+			end
+
+			switch dir
+				case 'north'; az = 0;
+				case 'east' ; az = 90;
+				case 'south'; az = 180;
+				case 'west' ; az = 270;
+				otherwise   ; az = 0;
+			end
+
+		end
+		function dir_str = aoz2dir(cfg)
+			arguments (Input)
+				cfg.az (1,1) double
+				cfg.oz (1,1) double
+			end
+			arguments (Output)
+				dir_str (1,1) string
+			end
+
+			if cfg.oz == 0
+				dir_str = 'vertical';
+				return;
+			end
+
+			az = round(cfg.az);
+			if isKey(Data.az2dir, az)
+				dir_str = Data.az2dir(az);
+			else; dir_str = 'unknown';
+			end
+		end
+
+	end
+end
