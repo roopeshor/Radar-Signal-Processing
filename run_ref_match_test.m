@@ -15,9 +15,9 @@ h_end = N.end_height / 1000;
 h = utils.compute_height_ranges(h_start, h_end, N.m_sNumOfRangeBins);
 
 dirs = [N,S,W,E,V];
-% %% UVW
+%% UVW
 figure("Name", "UVW")
-plot_compared_ref((E.ref_M1 - W.ref_M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
+plot_compared_ref((W.ref_M1 - E.ref_M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
 plot_compared_ref((S.ref_M1 - N.ref_M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
 theta = 10;
 c_th = cosd(theta);
