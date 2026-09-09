@@ -63,7 +63,7 @@ classdef BeamHeader
 				cfg = struct()
 			end
 
-			% apply given data if its beamheader or struct
+			% apply given data if its BeamHeader or struct
 			if class(cfg) == "BeamHeader" || class(cfg) == "struct"
 				bhf = properties("BeamHeader");
 				for i = 1:length(bhf)
