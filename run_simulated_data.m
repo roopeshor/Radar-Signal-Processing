@@ -86,24 +86,3 @@ ylabel("height (km)")
 title(title_);
 legend(["ref", "calc"]);
 end
-
-function visualize_spectra(spectra, M1s, idx, direction, heights, max_velocity, start_height, end_height)
-subplot(1,5,idx);
-warning('off', 'MATLAB:log:logOfZero');
-x_bounds = [-max_velocity, max_velocity];
-imagesc(x_bounds, [start_height, end_height], 10 * log10(spectra));
-hold on;
-
-% Plot calculated and true moments
-if ~isempty(M1s{1}), plot(M1s{1}, heights, 'w-', 'LineWidth', 1, 'Color', "red"); end
-if ~isempty(M1s{2}), plot(M1s{2}, heights, 'w-', 'LineWidth', 1, 'Color', "black"); end
-
-xlim(x_bounds);
-hold off;
-set(gca, 'YDir', 'normal');
-colormap('Parula');
-
-xlabel('Doppler Velocity (m/s)');
-ylabel('Altitude (km)');
-title(direction);
-end
