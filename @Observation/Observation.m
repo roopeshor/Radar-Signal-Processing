@@ -21,7 +21,7 @@ classdef Observation
 		ref_V (:, 1) double
 		ref_W (:, 1) double
 
-		% DBS factors: scaling factor to convert Doppler frequencies (Hz) into wind velocities (m/s).
+		% DBS factors [m]: scaling factor to convert Doppler frequencies (Hz) into wind velocities (m/s).
 		% Horizontal DBS factor = λ/(2sin(oz))
 		DBS_Factor_H (1, 1) double
 		% Vertical DBS factor = λ/2
@@ -80,7 +80,7 @@ classdef Observation
 			obs.DBS_Factor_H = vel_factor / (2 * sind(obs.north.m_fOffZenith));
 
 			obs.f_max = utils.compute_max_freq(obs.north.ipp_us, obs.north.n_coh);
-			obs.v_max = obs.f_max * vel_factor;
+			obs.v_max = obs.f_max * vel_factor; % DBS_V
 		end
 	end
 end

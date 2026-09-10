@@ -1,50 +1,57 @@
-filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15");
+filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15.raw");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
-obs = mccf.compute_all_spectra(obs);
+% obs = mccf.compute_all_spectra(obs);
+% obs = simple.denoise_all_beams(obs);
+% obs = st.compute_all_moments(obs);
 
-u = obs.ref_U;
-v = obs.ref_V;
-w = obs.ref_W;
-%[z, u, v, w] = generate_wind_profile(nRangeBins=173);
+% u = obs.ref_U;
+% v = obs.ref_V;
+% w = obs.ref_W;
+[z, u, v, w] = generate_wind_profile(nRangeBins=obs.west.m_sNumOfRangeBins);
 
 synth = utils.create_synthetic_observation(u, v, w, headerFields=obs.west);
 disp("Computing Spectra...");
 synth = mccf.compute_all_spectra(synth);
+synth = simple.denoise_all_beams(synth);
+synth = st.compute_all_moments(synth);
 
 h_start = synth.west.start_height / 1000;
 h_end   = synth.west.end_height / 1000;
 [h,x]   = size(synth.west.spectra);
-x_ticks = linspace(-obs.v_max, obs.v_max, x);
+x_ticks = linspace(-synth.v_max, synth.v_max, x);
 y_ticks = linspace(h_start, h_end, h);
 l = ["north", "east", "west", "south", "vertical"];
-for i = 1:5
+for i = 1:1
 	d = l(i);
 	disp(d + ", raw: beam" + string(obs.(d).m_sCurrentBeamCnt) + " : az" + string(obs.(d).m_fAzimuth) + " : oz" + string(obs.(d).m_fOffZenith))
 	disp(d + ", syn: beam" + string(synth.(d).m_sCurrentBeamCnt) + " : az" + string(synth.(d).m_fAzimuth) + " : oz" + string(synth.(d).m_fOffZenith))
+
 	figure
 	subplot(1, 2, 1);
-	syn_d = synth.(d).spectra/max(synth.(d).spectra, [], 'all');
-	obs_d  = obs.(d).spectra/max(obs.(d).spectra, [], 'all');
+	% already normalized
+	syn_d = synth.(d).spectra;
+	obs_d = obs.(d).spectra;
 	utils.plot_doppler_spectra(...
-		spectra   = -log10(fliplr(obs_d)),             ...
-		comp_m    = obs.(d).ref_M1 * obs.DBS_Factor_V, ...
+		spectra   = log10(obs_d),              ...
 		ref_m     = obs.(d).ref_M1 * obs.DBS_Factor_V, ...
 		direction = obs.(d).direction,                 ...
 		heights   = y_ticks,                           ...
 		x_max     = obs.v_max                          ...
 		)
+	% comp_m    = obs.(d).M1 * obs.DBS_Factor_V, ...
 	hold off
 	subplot(1, 2, 2);
 	utils.plot_doppler_spectra(...
-		spectra   = -log10(fliplr(syn_d)),             ...
-		comp_m    = obs.(d).ref_M1 * obs.DBS_Factor_V, ...
-		ref_m     = obs.(d).ref_M1 * obs.DBS_Factor_V, ...
-		direction = obs.(d).direction,                 ...
+		spectra   = log10(syn_d),              ...
+		ref_m     = synth.(d).ref_M1, ...
+		direction = synth.(d).direction,                 ...
 		heights   = y_ticks,                           ...
-		x_max     = obs.v_max                          ...
+		x_max     = synth.v_max                          ...
 		)
+	% comp_m    = synth.(d).M1 * synth.DBS_Factor_V, ...
+	hold off
 end
 % stacked_spectrogram(,syn_dsyn_d
 % 	y_ticks, x_ticks,             ...

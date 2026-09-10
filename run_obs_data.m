@@ -11,12 +11,12 @@ obs = Observation(filepath);
 % obs = simple.compute_all_moments(obs);
 
 % MCCF Method
-% obs = mccf.compute_all_spectra(obs);
-% obs = simple.denoise_all_beams(obs);
-% obs = mccf.compute_all_moments(obs);
+obs = mccf.compute_all_spectra(obs);
+obs = simple.denoise_all_beams(obs);
+obs = mccf.compute_all_moments(obs);
 
-obs = st.compute_all_spectra(obs);
-obs = st.compute_all_moments(obs);
+% obs = st.compute_all_spectra(obs);
+% obs = st.compute_all_moments(obs);
 % obs = mccf.compute_all_moments(obs);
 
 N = obs.north;
@@ -41,9 +41,9 @@ h = utils.compute_height_ranges(h_start, h_end, N.m_sNumOfRangeBins);
 
 dirs = [N,S,W,E,V];
 
-for i = 1:5
+for i = 1:2
 	d = dirs(i);
-	subplot(1, 5, i);
+	subplot(1, 2, i);
 	utils.plot_doppler_spectra(...
 		spectra   = log10(d.spectra),   ...
 		comp_m    = d.M1 * obs.DBS_Factor_V,     ...
@@ -56,10 +56,9 @@ end
 
 % %% UVW
 figure("Name", "UVW")
-plot_compared_ref((W.M1 - E.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
-plot_compared_ref((S.M1 - N.M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
-theta = 10;
-c_th = cosd(theta);
+plot_compared_ref(-(E.M1 - W.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
+plot_compared_ref(-(N.M1 - S.M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
+c_th = cosd(N.m_fOffZenith);
 sum_M1 = E.M1 + W.M1 + N.M1 + S.M1;
 calc_W = -obs.DBS_Factor_V * (c_th * sum_M1 + V.M1) / (4 * c_th^2 + 1);
 

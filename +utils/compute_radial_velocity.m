@@ -1,12 +1,9 @@
 function vr = compute_radial_velocity(u, v, w, az, oz)
-	% computes component of wind velocity parallel to the direction of the radar beam
-theta = oz * pi / 180;
-phi   = az * pi / 180;
+% computes component of wind velocity parallel to the direction of the radar beam
 if (oz == 0)
 	vr = w;
 else
-	vr = u .* sin(phi) .* sin(theta) + ...
-		v .* cos(phi) .* sin(theta);
+	vr = (u .* sind(az) + v .* cosd(az)) .* sind(oz) + w .* cosd(oz);
 end
 end
 %            |<--sin(th)--> .
