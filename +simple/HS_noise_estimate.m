@@ -39,7 +39,7 @@ arguments (Input)
 	beam RadarData
 end
 arguments (Output)
-	noise_level (:, 1) double  % (height_bins × 1)
+	noise_level (1, :) double  % (height_bins × 1)
 end
 
 M = beam.m_sNumOfInCohIntegrations;

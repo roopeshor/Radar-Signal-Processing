@@ -16,10 +16,10 @@ classdef Observation
 
 		raw_filepath string
 
-		ref_height (:, 1) double % from uvw file
-		ref_U (:, 1) double
-		ref_V (:, 1) double
-		ref_W (:, 1) double
+		ref_height (1, :) double % from uvw file
+		ref_U (1, :) double
+		ref_V (1, :) double
+		ref_W (1, :) double
 
 		% DBS factors [m]: scaling factor to convert Doppler frequencies (Hz) into wind velocities (m/s).
 		% Horizontal DBS factor = λ/(2sin(oz))
