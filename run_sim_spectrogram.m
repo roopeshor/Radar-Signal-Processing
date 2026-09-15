@@ -2,20 +2,16 @@ filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15.raw");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
-% obs = mccf.compute_all_spectra(obs);
-% obs = simple.denoise_all_beams(obs);
-% obs = st.compute_all_moments(obs);
-
 % u = obs.ref_U;
 % v = obs.ref_V;
 % w = obs.ref_W;
 [z, u, v, w] = generate_wind_profile(nRangeBins=obs.west.m_sNumOfRangeBins);
 
 synth = utils.create_synthetic_observation(u, v, w, headerFields=obs.west);
+
 disp("Computing Spectra...");
-synth = mccf.compute_all_spectra(synth);
+synth = utils.fill_spectras(synth, @mccf.compute_spectra);
 synth = simple.denoise_all_beams(synth);
-synth = st.compute_all_moments(synth);
 
 h_start = synth.west.start_height / 1000;
 h_end   = synth.west.end_height / 1000;

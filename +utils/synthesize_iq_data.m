@@ -25,7 +25,7 @@ PRF_eff = 1 / (ipp_us * 1e-6 * cohIn);
 sigma_f = 2 * cfg.spec_w / wavelen;
 
 if isempty(cfg.SNR)
-	cfg.SNR = 10 .^ (linspace(40, -40, nRangeBinss)' / 10);
+	cfg.SNR = 10 .^ (linspace(40, -40, nRangeBins)' / 10);
 end
 
 f = linspace(-PRF_eff/2, PRF_eff/2 - PRF_eff/NFFT, NFFT);

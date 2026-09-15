@@ -11,13 +11,13 @@ DBS_Factor_H = vel_factor / (2 * sind(10));
 
 obs = utils.create_synthetic_observation(...
 	u, v, w,...
-	SNR          = 10 .^ (ones(1,nRangeBins) * 100), ...
+	SNR          = 10 .^ (linspace(100, -100, nRangeBins)/10), ...
 	spec_w       = 0.1,                       ...
-	add_iq_noise = false ...
+	add_iq_noise = true ...
 	);
-obs = simple.compute_all_spectra(obs);
-% obs = simple.denoise_all_beams(obs);
-obs = simple.compute_all_moments(obs);
+obs = utils.fill_spectras(obs, @simple.compute_spectra);
+obs = simple.denoise_all_beams(obs);
+obs = utils.fill_moments(obs, @simple.compute_moments);
 
 N = obs.north;
 S = obs.south;
@@ -67,22 +67,6 @@ end
 colorbar;
 %% UVW Wind Vector Plotting
 figure("Name", "UVW")
-plot_compared_ref((E.M1 - W.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
-plot_compared_ref((N.M1 - S.M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
-plot_compared_ref(V.M1 * obs.DBS_Factor_V, obs.ref_W, 3, h, "Vertical (W)")
-
-%% Helper Plotting Functions
-function plot_compared_ref(calc, ref, idx, heights, title_, plots)
-if nargin < 6
-	plots = 3;
-end
-subplot(1, plots, idx)
-plot(ref, heights); hold on
-plot(calc, heights);
-xlim([min(ref) * 2, max(ref) * 2]);
-ylim([min(heights), max(heights)]);
-xlabel("wind velocity (m/s)")
-ylabel("height (km)")
-title(title_);
-legend(["ref", "calc"]);
-end
+utils.plot_compared_M1((E.M1 - W.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
+utils.plot_compared_M1((N.M1 - S.M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
+utils.plot_compared_M1(V.M1 * obs.DBS_Factor_V, obs.ref_W, 3, h, "Vertical (W)")

@@ -4,7 +4,7 @@ filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
-obs = mccf.compute_all_spectra(obs);
+obs = utils.fill_spectras(obs, @mccf.compute_spectra);
 % obs = simple.denoise_all_beams(obs);
 
 data = obs.west.spectra;

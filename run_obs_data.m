@@ -6,18 +6,18 @@ disp("Processing file: " + filepath);
 obs = Observation(filepath);
 
 % % old method
-% obs = simple.compute_all_spectra(obs);
+% obs = utils.fill_spectras(obs, simple.compute_spectra);
 % obs = simple.denoise_all_beams(obs);
-% obs = simple.compute_all_moments(obs);
+% obs = utils.fill_moments(obs, simple.compute_moments);
 
 % MCCF Method
-obs = mccf.compute_all_spectra(obs);
+obs = utils.fill_spectras(obs, @mccf.compute_spectra);
 obs = simple.denoise_all_beams(obs);
-obs = mccf.compute_all_moments(obs);
+obs = utils.fill_moments(obs, @mccf.compute_moments);
 
-% obs = st.compute_all_spectra(obs);
-% obs = st.compute_all_moments(obs);
-% obs = mccf.compute_all_moments(obs);
+% obs = utils.fill_spectras(obs, st.compute_spectra);
+% obs = utils.fill_moments(obs, st.compute_moments);
+% obs = utils.fill_moments(obs, mccf.compute_moments);
 
 N = obs.north;
 S = obs.south;
