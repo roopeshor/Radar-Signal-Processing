@@ -1,34 +1,19 @@
 function new_beam = compute_moments(beam, options)
-%ST.COMPUTE_MOMENTS  Computes radar moments matching the reference algorithm.
+% ST.COMPUTE_MOMENTS Calculates Doppler moments via clutter notch, HS noise floor subtraction, and parabolic fit.
 %
-%   The algorithm inferred from the reference .mmts files:
-%
-%     1. Clutter notch: zero out DC bins (±clutter_notch_bins around centre).
-%     2. Hildebrand-Sekhon noise estimation on the notched spectrum.
-%     3. Subtract noise floor; clip negatives to zero.
-%     4. Find the peak bin.
-%     5. 3-point parabolic interpolation for sub-bin M1 precision.
-%     6. Compute M0, M2 from the denoised spectrum.
-%
-%   This differs from simple.compute_moments which uses a peak-expand centroid
-%   and has no clutter notch, causing it to lock onto DC clutter instead of
-%   the atmospheric signal in clutter-contaminated range bins.
-%
-%   Input Arguments:
-%     beam                    - RadarData object. Uses denoised_spectra if
-%                               available, otherwise falls back to spectra.
-%     options.clutter_notch_bins (1,1) double = 1
-%                             - Number of bins on each side of DC to zero out.
-%                               Set to 0 to disable the notch.
-%
-%   Output Arguments:
-%     new_beam - RadarData with M0, M1, M2 populated.
+%   Applies a clutter notch around the DC bin, estimates noise floor using Hildebrand-Sekhon
+%   statistics, subtracts the noise floor, and uses 3-point parabolic peak interpolation to derive
+%   sub-bin mean Doppler frequency shift (M1 in Hz). Evaluates total signal power (M0) and spectral
+%   width variance (M2).
 
 arguments (Input)
+	% Radar beam object containing spectra (or denoised_spectra) and timing parameters.
 	beam RadarData
+	% Number of bins on each side of DC to zero out for clutter notch.
 	options.clutter_notch_bins (1,1) double = 1
 end
 arguments (Output)
+	% Modified RadarData beam populated with M0, M1 (Hz), and M2 profiles.
 	new_beam RadarData
 end
 
@@ -43,14 +28,12 @@ end
 
 [height_bins, nfft] = size(P_input);
 
-% Frequency axis (Hz) corresponding to each FFT bin after fftshift.
-% Bins are indexed 0-based as: (k - nfft/2) / (Ts * nfft)
 bin_indices = (0:(nfft-1)) - nfft/2;
-Ts  = ipp_us * n_coh * 1e-6;       % effective sampling period (s)
-df  = 1 / (Ts * nfft);             % frequency resolution (Hz)
-freq = bin_indices / (Ts * nfft);  % (1 × NFFT) Hz axis
+Ts  = ipp_us * n_coh * 1e-6;
+df  = 1 / (Ts * nfft);
+freq = bin_indices / (Ts * nfft);
 
-dc_bin = nfft / 2 + 1;  % 1-based index of the DC (0 Hz) bin after fftshift
+dc_bin = nfft / 2 + 1;
 
 M0 = zeros(1, height_bins);
 M1 = zeros(1, height_bins);
@@ -60,15 +43,12 @@ for i = 1:height_bins
 
 	P = P_input(i, :);
 
-	% Step 1: Clutter notch — zero out DC and its neighbours.
-	%         This prevents DC ground clutter from dominating the peak search.
+	% Apply DC clutter notch
 	notch_start = max(1,    dc_bin - options.clutter_notch_bins);
 	notch_end   = min(nfft, dc_bin + options.clutter_notch_bins);
 	P(notch_start:notch_end) = 0;
 
-	% Step 2: Hildebrand-Sekhon noise estimation.
-	%         Sort spectrum ascending and find the largest subset whose
-	%         variance ≤ mean² (i.e., consistent with white noise).
+	% Hildebrand-Sekhon noise floor estimation
 	P_sorted = sort(P);
 	noise_level = P_sorted(1);
 	for k = length(P_sorted):-1:2
@@ -79,17 +59,12 @@ for i = 1:height_bins
 		end
 	end
 
-	% Step 3: Subtract noise floor, clip to zero.
 	P = P - noise_level;
 	P(P < 0) = 0;
 
-	% Step 4: Find peak bin.
 	[~, l] = max(P);
 
-	% Step 5: 3-point parabolic peak interpolation.
-	%         Fits a parabola through P[l-1], P[l], P[l+1] and returns the
-	%         analytical peak location for sub-bin frequency precision.
-	%         Falls back to the bin centre if at an edge or flat peak.
+	% 3-point parabolic peak interpolation for sub-bin M1 precision
 	if l > 1 && l < nfft
 		P_lo   = P(l - 1);
 		P_peak = P(l);
@@ -104,7 +79,6 @@ for i = 1:height_bins
 		M1(i) = freq(l);
 	end
 
-	% Step 6: M0 and M2 from the full denoised spectrum (after notch).
 	M0(i) = sum(P);
 	M2(i) = sum(((freq - M1(i)) .^ 2) .* P) / M0(i);
 

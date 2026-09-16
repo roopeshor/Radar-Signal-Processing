@@ -1,4 +1,3 @@
-%% run_sim.m
 % Synthesizes raw ST Radar data from a prescribed wind profile
 % and then runs the standard spectrum and moments processing pipeline.
 
@@ -16,7 +15,7 @@ obs = utils.create_synthetic_observation(...
 	add_iq_noise = true ...
 	);
 obs = utils.fill_spectras(obs, @simple.compute_spectra);
-obs = simple.denoise_all_beams(obs);
+obs = simple.HS_denoise_all_beams(obs);
 obs = utils.fill_moments(obs, @simple.compute_moments);
 
 N = obs.north;
@@ -67,6 +66,6 @@ end
 colorbar;
 %% UVW Wind Vector Plotting
 figure("Name", "UVW")
-utils.plot_compared_M1((E.M1 - W.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
-utils.plot_compared_M1((N.M1 - S.M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
-utils.plot_compared_M1(V.M1 * obs.DBS_Factor_V, obs.ref_W, 3, h, "Vertical (W)")
+utils.plot_compared_M1((W.M1 - E.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
+utils.plot_compared_M1((S.M1 - N.M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
+utils.plot_compared_M1(-V.M1 * obs.DBS_Factor_V, obs.ref_W, 3, h, "Vertical (W)")

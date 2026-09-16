@@ -1,23 +1,18 @@
-% filepath = fullfile("Data/other/EXP_DBS_CH4_29Jul2026_19_21_31");
-% filepath = fullfile("Data/other/EXP_DBS_CH4_29Jul2026_19_20_07");
-filepath = fullfile("Data/other/EXP_DBS_CH4_29Jul2026_19_17_20");
+% put base file name here (without file extension)
+filepath = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_19_17_20");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
 
-% % old method
-% obs = utils.fill_spectras(obs, simple.compute_spectra);
-% obs = simple.denoise_all_beams(obs);
-% obs = utils.fill_moments(obs, simple.compute_moments);
-
-% MCCF Method
+%% MCCF Method
 obs = utils.fill_spectras(obs, @mccf.compute_spectra);
-obs = simple.denoise_all_beams(obs);
+obs = simple.HS_denoise_all_beams(obs);
 obs = utils.fill_moments(obs, @mccf.compute_moments);
 
-% obs = utils.fill_spectras(obs, st.compute_spectra);
-% obs = utils.fill_moments(obs, st.compute_moments);
-% obs = utils.fill_moments(obs, mccf.compute_moments);
+%% for using other method like `simple`, uncomment following and comment above lines
+% obs = utils.fill_spectras(obs, @simple.compute_spectra);
+% obs = simple.HS_denoise_all_beams(obs);
+% obs = utils.fill_moments(obs, @simple.compute_moments);
 
 N = obs.north;
 S = obs.south;
@@ -29,13 +24,7 @@ h_start = N.start_height / 1000;
 h_end = N.end_height / 1000;
 
 %% Doppler Spectra and Moments
-% figure("Name", "Spectra");
-
-N.M1 = medfilt1(N.M1, 5);
-E.M1 = medfilt1(E.M1, 5);
-W.M1 = medfilt1(W.M1, 5);
-S.M1 = medfilt1(S.M1, 5);
-V.M1 = medfilt1(V.M1, 5);
+figure("Name", "Spectra");
 
 h = utils.compute_height_ranges(h_start, h_end, N.m_sNumOfRangeBins);
 
@@ -56,27 +45,11 @@ end
 
 % %% UVW
 figure("Name", "UVW")
-plot_compared_ref(-(E.M1 - W.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
-plot_compared_ref(-(N.M1 - S.M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
+utils.plot_compared_M1(-(E.M1 - W.M1) * obs.DBS_Factor_H, obs.ref_U, 1, h, "Zonal (U)")
+utils.plot_compared_M1(-(N.M1 - S.M1) * obs.DBS_Factor_H, obs.ref_V, 2, h, "Meridional (V)")
+
 c_th = cosd(N.m_fOffZenith);
 sum_M1 = E.M1 + W.M1 + N.M1 + S.M1;
 calc_W = -obs.DBS_Factor_V * (c_th * sum_M1 + V.M1) / (4 * c_th^2 + 1);
 
-plot_compared_ref(calc_W, obs.ref_W, 3, h, "Vertical (W)")
-
-
-%% Functions
-
-function plot_compared_ref(calc, ref, idx, heights, title_, plots)
-if nargin < 6
-	plots = 3;
-end
-subplot(1, plots, idx)
-plot(ref, heights); hold on
-plot(calc, heights);
-xlim([min(ref) * 2, max(ref) * 2]);
-xlabel("wind velocity (m/s)")
-ylabel("height (km)")
-title(title_);
-legend(["ref", "calc"]);
-end
+utils.plot_compared_M1(calc_W, obs.ref_W, 3, h, "Vertical (W)")

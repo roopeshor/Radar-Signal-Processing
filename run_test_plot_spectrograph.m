@@ -1,11 +1,11 @@
-%%% Testing the spectrogram plotter
+%%% Testing stacked spectrogram plotter
 
 filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
 obs = utils.fill_spectras(obs, @mccf.compute_spectra);
-% obs = simple.denoise_all_beams(obs);
+% obs = simple.HS_denoise_all_beams(obs);
 
 data = obs.west.spectra;
 h_start = obs.north.start_height / 1000;

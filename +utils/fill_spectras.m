@@ -1,13 +1,17 @@
 function new_obs = fill_spectras(obs, fx)
-%fill_spectras computes spectrum of all beams in the observation with given function
+% UTILS.FILL_SPECTRAS Batch applies a spectrum computation function handle across all beams in an Observation.
+
 arguments (Input)
+	% Observation object.
 	obs Observation
-	% function to apply on all beams
+	% Function handle for computing spectra from a RadarData beam.
 	fx function_handle
 end
 arguments (Output)
+	% Modified Observation object with populated spectra and denoised_spectra.
 	new_obs Observation
 end
+
 new_obs = obs;
 directions = ["north", "east", "west", "south", "vertical"];
 

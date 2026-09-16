@@ -1,22 +1,28 @@
 function out = add_reference_data(beams, filepath, options)
-% add_reference_data packages moments file corresponding to each beam with RadarData from read_raw_data.
-% Also returns UVW data from corresponding UVW file (if exists)
-%   Input Arguments:
-%       beams - array of beams from read_raw_data
+% UTILS.ADD_REFERENCE_DATA Attaches benchmark reference moments (.mmts) and UVW wind profiles (.uvw) to radar beams.
+%
+%   Parses reference text files matching the observation base filename, populating reference moment fields
+%   (ref_M0, ref_M1, ref_M2, ref_SNR, ref_noise_level) on each beam and extracting reference wind vectors (U, V, W).
 
 arguments (Input)
+	% 5 x 1 array of RadarData beam objects.
 	beams (5, 1) RadarData
+	% Base filepath of observation (with or without extension).
 	filepath string
+	% Flag to enable loading .mmts reference moment files.
 	options.add_mmts = true
+	% Flag to enable loading .uvw reference wind files.
 	options.add_uvw = true
+	% Extension suffix for UVW reference file.
 	options.uvw_file_ext = "_W1.uvw"
+	% Mapping from direction label to .mmts filename extension.
 	options.mmts_file_ext = Data.dir2mmts_file_ext
 end
 arguments (Output)
+	% Struct containing beam_struct, reference U, V, W wind vectors, and height array.
 	out (1,1) struct
 end
 
-%% moments
 beam_struct = struct( ...
 	"vertical", RadarData(), ...
 	"north", RadarData(), ...
@@ -56,7 +62,6 @@ for i = 1:5
 		beam_struct.(direction) = beam;
 	end
 
-	%% UVW
 	height = [];
 	U = [];
 	V = [];

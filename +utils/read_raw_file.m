@@ -1,21 +1,15 @@
 function Header = read_raw_file(filepath)
-% read_raw_file  Parse a binary ST-Radar .raw file into a RadarData array.
+% UTILS.READ_RAW_FILE Binary parser for ST radar (.raw) experimental data files.
 %
-%   Header = read_raw_file(filepath)
-%
-%   Input:
-%     filepath - string. Path to the .raw binary radar data file.
-%   Output:
-%     Header   - RadarData array (1 × beam_count). Each element holds
-%                the 1024-byte header fields and a complex BeamData
-%                cube (RangeBins × NFFT × InCohIntegrations).
-%
-%   See also RadarData, add_reference_data
+%   Reads 1024-byte binary header blocks and 32-bit complex IQ time series data for all beams,
+%   constructing an array of RadarData objects populated with beam metadata and BeamData cubes.
 
 arguments (Input)
+	% Path to binary .raw radar observation file.
 	filepath (1,1) string
 end
 arguments (Output)
+	% Array of RadarData beam objects (typically 5 beams).
 	Header RadarData
 end
 
@@ -27,7 +21,6 @@ end
 
 DEFAULT_MAGIC_NUMBER = 369;
 
-% Seek to offset 120 (byte 121) to read m_sTotalNumberofBeams (int16)
 fseek(fPtr, 120, 'bof');
 beam_count = double(fread(fPtr, 1, 'int16'));
 fseek(fPtr, 0, 'bof');
@@ -38,7 +31,6 @@ if isempty(beam_count) || beam_count <= 0
 	return;
 end
 
-% Preallocate RadarData array
 Header = RadarData.empty(0, 5);
 
 for beam_No = 1:beam_count
@@ -117,13 +109,11 @@ for beam_No = 1:beam_count
 		oz=Header(beam_No).m_fOffZenith ...
 		);
 
-	% aliases:
 	Header(beam_No).ipp_us = Header(beam_No).m_fIntrPulsePeriod_us;
 	Header(beam_No).n_coh = Header(beam_No).m_sNumOfCohIntegrations;
 	Header(beam_No).start_height = Header(beam_No).m_fWindow1StartHeight;
 	Header(beam_No).end_height = Header(beam_No).m_fWindow1EndHeight;
 
-	% In DMA Data processing NSA = 0 (non experiment condition)
 	if Header(beam_No).m_sNumOfInCohIntegrations <= 0
 		Header(beam_No).m_sNumOfInCohIntegrations = 1;
 	end

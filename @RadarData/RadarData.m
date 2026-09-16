@@ -48,6 +48,8 @@ classdef RadarData < BeamHeader
 			obj.start_height = obj.m_fWindow1StartHeight;
 			obj.end_height = obj.m_fWindow1EndHeight;
 			obj.direction = Data.aoz2dir(az=obj.m_fAzimuth, oz=obj.m_fOffZenith);
+
+			obj.algorithm_parameters = struct();
 		end
 	end
 end

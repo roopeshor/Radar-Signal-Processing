@@ -1,7 +1,11 @@
 function new_beam = compute_moments(beam)
-% compute_moments computes woodman moments using MCCF cost function.
-% Stores results in M0, M1, M2 and algorithm parameters.
-% Uses beam.denoised_spectra if available, else beam.spectra.
+% MCCF.COMPUTE_MOMENTS Computes Doppler spectral moments using cost-function-guided peak tracking.
+%
+%   Identifies surviving spectral peaks across range bins and selects the atmospheric peak by
+%   minimizing a composite cost penalty balancing spectral amplitude against vertical Doppler shift
+%   discontinuity: Penalty = W_power * (1 / Power) + W_jump * (|loc - prev_loc| / NFFT). Integration
+%   is bounded by local zero-crossings to evaluate total power (M0), mean Doppler shift in Hz (M1),
+%   and spectral width variance (M2).
 
 arguments (Input)
 	beam RadarData
@@ -9,43 +13,39 @@ end
 arguments (Output)
 	new_beam RadarData
 end
+
 ipp_us = beam.ipp_us;
 n_coh = beam.n_coh;
-[height_bins, nfft] = size(beam.denoised_spectra);
 
 if ~isempty(beam.denoised_spectra)
 	P_filtered = beam.denoised_spectra;
 else
 	P_filtered = beam.spectra;
-	disp("No denoised spectra found, using raw spectra")
+	warning("No denoised spectra found in beam")
 end
+
+[height_bins, nfft] = size(P_filtered);
 
 M0 = zeros(1, height_bins);
 M1 = zeros(1, height_bins);
 M2 = zeros(1, height_bins);
 
-% Space-Time Doppler Window: track previous peak to enforce continuity
 prev_peak_idx = round(nfft / 2);
-
 cost_scores = zeros(height_bins, nfft);
+
+W_power = 0.8;
+W_jump = 0.2;
 
 for i = 1:height_bins
 	P = P_filtered(i, :);
 
-	% Find local maxima (surviving peaks)
 	[pks, locs] = findpeaks(P);
 
 	if isempty(pks)
-		% fallback if no clear peaks found
 		[~, l] = max(P);
 		locs = l;
 		pks = P(l);
 	end
-
-	% Cost function evaluation
-	% Penalty = W1 * (1 / Power) + W2 * (Velocity Jump)
-	W_power = 0.8;
-	W_jump = 0.2;
 
 	best_penalty = inf;
 	best_loc = locs(1);
@@ -54,12 +54,10 @@ for i = 1:height_bins
 		loc = locs(p_idx);
 		power = pks(p_idx);
 
-		% Normalized power penalty
 		power_penalty = 1 / (power + 1e-6);
 
-		% Jump penalty (difference in bins from previous altitude)
 		if i == 1
-			jump_penalty = 0; % No previous height to compare
+			jump_penalty = 0;
 		else
 			jump_penalty = abs(loc - prev_peak_idx) / nfft;
 		end
@@ -74,9 +72,9 @@ for i = 1:height_bins
 	end
 
 	l = best_loc;
-	prev_peak_idx = l; % update for next height bin
+	prev_peak_idx = l;
 
-	% iteratively find bounds of "valid" values around chosen peak 'l'
+	% Bounding spectral peak to zero-crossings
 	minI = l;
 	maxI = l;
 	while minI > 1 && P(minI - 1) > 0
@@ -87,28 +85,18 @@ for i = 1:height_bins
 		maxI = maxI + 1;
 	end
 
-	% extract that piece only
 	signal_block = P(minI:maxI);
-	indices = minI:maxI;
+	indices = (minI:maxI) - 1;
 
-	% sum along rows (nfft axis)
 	M0(i) = sum(signal_block);
-
-	% Map to 0-based index for math
-	indices = indices - 1;
-
-	% frequency bins corresponding to each indices
 	freq = (indices - (nfft / 2)) / (ipp_us * n_coh * nfft * 1e-6);
 	M1(i) = sum(signal_block .* freq) / M0(i);
 	M2(i) = sum(((freq - M1(i)) .^ 2) .* signal_block) / M0(i);
 end
 
-% Store algorithm parameters
-alg_params = struct("cost_scores", cost_scores);
-
 beam.M0 = M0;
 beam.M1 = M1;
 beam.M2 = M2;
-beam.algorithm_parameters = alg_params;
+beam.algorithm_parameters.mccf_cost_scores = cost_scores;
 new_beam = beam;
 end

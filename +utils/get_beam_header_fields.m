@@ -1,11 +1,18 @@
 function [keys, vals] = get_beam_header_fields(b, config)
+% UTILS.GET_BEAM_HEADER_FIELDS Extracts binary beam header fields into key-value pairs for metadata inspection.
+
 arguments (Input)
+	% RadarData beam object.
 	b RadarData
+	% Flag to include timestamp fields in output.
 	config.add_timestamp = false
+	% Flag to sanitize non-printable ASCII characters from comment strings.
 	config.remove_ctrl_char = true
 end
 arguments (Output)
+	% Cell array of header field property names.
 	keys cell
+	% Cell array of header field values.
 	vals cell
 end
 

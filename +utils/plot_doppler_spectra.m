@@ -1,26 +1,26 @@
-
 function plot_doppler_spectra(cfg)
-%plot_doppler_spectra  plots doppler spectra and overlayes computed & reference moments
-arguments
+% UTILS.PLOT_DOPPLER_SPECTRA Renders range-Doppler spectrographs with overlaid computed and reference moments.
+
+arguments (Input)
+	% Power spectra matrix (RangeBins x NFFT).
 	cfg.spectra (:, 1024) double
-
-	% computed moment
+	% Computed Doppler moments profile vector.
 	cfg.comp_m (1, :) double = []
-	% reference moment
+	% Reference Doppler moments profile vector.
 	cfg.ref_m (1, :) double = []
-	% direction of beam
-	cfg.direction string
-	% height array
-	cfg.heights (1, :) double
-	% max doppler velocity or doppler frequency
+	% Beam direction label string.
+	cfg.direction string = ""
+	% Altitude heights profile vector.
+	cfg.heights (1, :) double = []
+	% Maximum unambiguous Doppler velocity or frequency bound.
 	cfg.x_max double = 30
-	% whether to add legends
+	% Flag to display plot legend.
 	cfg.add_legend logical = true
-
+	% Line color for computed moments curve.
 	cfg.comp_m_color = "black"
+	% Line color for reference moments curve.
 	cfg.ref_m_color = "red"
-	% what is being plotted? frequency shift ("freq") or velocity ("velocity")
-	% if velocity is used, the spectrum and given moments will be flipped left-right
+	% X-axis domain mode ("velocity" or "freq").
 	cfg.x_axis_type string = "velocity"
 end
 
