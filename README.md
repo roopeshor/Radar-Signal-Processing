@@ -58,13 +58,16 @@ Method modules are organized into package directories prefixed with `+`. Data ob
 ├── generate_wind_profile.m        <-- generates a artifical wind profile using combination of models.
 ├── @Observation                   <-- Value class representing a 5-beam observation dataset
 ├── @RadarData                     <-- Subclass of BeamHeader holding raw IQ cubes & post-processing fields
-└── @BeamHeader                    <-- Base class for 52 radar binary header fields
-└── @Data                          <-- Utility conversion stuffs
+├── @BeamHeader                    <-- Base class for 52 radar binary header fields
+├── @Data                          <-- Utility conversion stuffs
+└── Data                           <-- Folder containing actual radar data
 ```
 
-## Standard Execution Workflow
+The data is assumed to be in `Data` folder,
 
-### 1. Reading an Observation
+## Program flow
+
+### Reading an Observation
 Instantiate an `Observation` object using the base filename path. The parser automatically loads the binary raw data (`.raw`) and optional reference files (`.mmts`, `.uvw`):
 
 ```matlab
@@ -72,7 +75,7 @@ filepath = fullfile("Data", "EXP_DBS_CH4_29Jul2026_19_17_20");
 obs = Observation(filepath);
 ```
 
-### 2. Processing Pipeline via Hot-Swappable Endpoints
+### Processing Pipeline via Hot-Swappable Endpoints
 
 Methods (`+ime`, `@mccf`, `@st`, `@simple`) export standardized function handles for `compute_spectra` and `compute_moments`:
 
@@ -89,7 +92,7 @@ obs = simple.HS_denoise_all_beams(obs);
 obs = utils.fill_moments(obs, @mccf.compute_moments);
 ```
 
-### 3. Extracting Wind Profiles (DBS Equations)
+### Extracting Wind Profiles (DBS Equations)
 
 To retrieve zonal ($U$), meridional ($V$), and vertical ($W$) wind velocity profiles from the 5 beam moments:
 
