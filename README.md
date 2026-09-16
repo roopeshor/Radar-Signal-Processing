@@ -55,6 +55,7 @@ Method modules are organized into package directories prefixed with `+`. Data ob
 │   └── write_raw_file.m               │ Binary .raw radar file serializer
 
 ├── stacked_spectrogram.m          <-- Stacked doppler spectrum Plotter
+├── generate_wind_profile.m        <-- generates a artifical wind profile using combination of models.
 ├── @Observation                   <-- Value class representing a 5-beam observation dataset
 ├── @RadarData                     <-- Subclass of BeamHeader holding raw IQ cubes & post-processing fields
 └── @BeamHeader                    <-- Base class for 52 radar binary header fields
