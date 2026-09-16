@@ -73,14 +73,14 @@ obs = Observation(filepath);
 
 ### 2. Processing Pipeline via Hot-Swappable Endpoints
 
-Methods (`+imeB`, `@mccf`, `@st`, `@simple`) export standardized function handles for `compute_spectra` and `compute_moments`:
+Methods (`+ime`, `@mccf`, `@st`, `@simple`) export standardized function handles for `compute_spectra` and `compute_moments`:
 
 ```matlab
-% Example: IME Method (+imeB)
-obs = utils.fill_spectras(obs, @imeB.compute_spectra);
-obs = imeB.remove_dc_from_beams(obs);
-obs = imeB.denoise_all_beams(obs);
-obs = utils.fill_moments(obs, @imeB.compute_moments);
+% Example: IME Method (+ime)
+obs = utils.fill_spectras(obs, @ime.compute_spectra);
+obs = ime.remove_dc_from_beams(obs);
+obs = ime.denoise_all_beams(obs);
+obs = utils.fill_moments(obs, @ime.compute_moments);
 
 % Example: MCCF Method (+mccf)
 obs = utils.fill_spectras(obs, @mccf.compute_spectra);
