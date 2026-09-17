@@ -1,10 +1,9 @@
-# ST Radar Wind Profile Estimation Framework
+# ST radar
+ST Radar wind profile estimation algorithms in NEWS+Z directions.
 
-Atmospheric ST (Stratosphere-Troposphere) Radar signal processing and wind profile estimation framework for 5-beam Doppler Beam Swinging (DBS) observations (North, East, South, West, Vertical).
+## Folder structure
 
-## Directory Architecture
-
-Method modules are organized into package directories prefixed with `+`. Data objects and utility functions provide a standardized abstraction layer.
+All class of algorithm are organized into package directories prefixed with `+` (matlab's convention). All functions within a algorithm are put in this folder.
 
 ```
 ├── run_ime.m                     <-- IME run script
@@ -41,25 +40,26 @@ Method modules are organized into package directories prefixed with `+`. Data ob
 │   └── HS_noise_estimate.m            │
 │
 ├── +utils                             <-- Shared utility functions
-│   ├── add_reference_data.m           │ Attaches reference .mmts and .uvw ground-truth files
+│   ├── add_reference_data.m           │ Attaches reference .mmts and .uvw data to Observation objects
 │   ├── compute_height_ranges.m        │ Altitude range bin generator
-│   ├── compute_max_freq.m             │ Nyquist unambiguous Doppler frequency calculator
-│   ├── compute_radial_velocity.m      │ 3D wind vector line-of-sight projection onto beam
-│   ├── compute_velocity_axis.m        │ 1D Doppler velocity axis (m/s) generator
-│   ├── create_synthetic_observation.m | Synthesizes artificial 5-beam Observation objects (Zrnic method)
-│   ├── create_synthetic_beamheader.m  | Synthesizes artificial beam header
+│   ├── compute_max_freq.m             │ calculates unambiguous Doppler velocity (V_max)
+│   ├── compute_radial_velocity.m      │ projects uvw to partiular direction
+│   ├── compute_velocity_axis.m        │ Generates Doppler velocity axis (-V_max...+V_max) (m/s)
+│   ├── create_synthetic_observation.m | Synthesizes artifical Observation objects
+│   ├── create_synthetic_beamheader.m  | Synthesizes beam header
 │   ├── fill_moments.m                 │ Batch moment function applier for Observation
 │   ├── fill_spectras.m                │ Batch spectra function applier for Observation
 │   ├── read_raw_file.m                │ Binary .raw radar file parser
-│   ├── synthesize_iq_data.m           │ synthesizes IQ data from radial velocity
+│   ├── synthesize_iq_data.m           │ synthesizes IQ data from radial velocity (Zrnic method)
 │   └── write_raw_file.m               │ Binary .raw radar file serializer
 │
-├── stacked_spectrogram.m          <-- Stacked doppler spectrum Plotter
+├── stacked_spectrogram.m          <-- Stacked doppler spectrum plotter
 ├── generate_wind_profile.m        <-- generates a artifical wind profile using combination of models.
-├── @Observation                   <-- Value class representing a 5-beam observation dataset
-├── @RadarData                     <-- Subclass of BeamHeader holding raw IQ cubes & post-processing fields
-├── @BeamHeader                    <-- Base class for 52 radar binary header fields
-├── @Data                          <-- Utility conversion stuffs
+├── @Observation                   <-- Value class representing a 5-beam observation dataset along with other properties
+├── @RadarData                     <-- Extension of BeamHeader holding raw IQ data & other fields
+├── @BeamHeader                    <-- Base class for 52 radar header fields
+├── @Data                          <-- Conversion functions and constants
+│
 └── Data                           <-- Folder containing actual radar data
 ```
 
