@@ -1,19 +1,20 @@
 %%% Testing stacked spectrogram plotter
 
-filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15");
+filepath = fullfile("Data" , "rain", "EXP_DBS_CH4_28Jun2026_14_28_16");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
 obs = utils.fill_spectras(obs, @mccf.compute_spectra);
 % obs = simple.HS_denoise_all_beams(obs);
 
-data = obs.west.spectra;
+data = obs.north.spectra;
 h_start = obs.north.start_height / 1000;
 h_end = obs.north.end_height / 1000;
 [h,x] = size(data);
 x_ticks = linspace(-obs.v_max, obs.v_max, x);
 y_ticks = linspace(h_start, h_end, h);
-stacked_spectrogram((data/max(data, [], 'all')), ...
+fig = figure('Visible', 'off');
+stacked_spectrogram(10*log10(data/max(data, [], 'all')), ...
 	y_ticks, x_ticks, ...
 	plot_gradiated    = true,     ...
 	plot_add_colorbar = true,     ...
@@ -26,5 +27,5 @@ stacked_spectrogram((data/max(data, [], 'all')), ...
 	ref_line_color    = "red"...
 	);
 
-xlim([min(x_ticks), max(x_ticks)]);
-ylim([min(y_ticks)-0.2, max(y_ticks)+0.4]);
+exportgraphics(fig, 'plots/28Jun2026_14_28_16-north-raw.png', 'Resolution', 700)
+close(fig);

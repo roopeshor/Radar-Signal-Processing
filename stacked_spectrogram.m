@@ -46,6 +46,9 @@ arguments
 
 	% fraction of input data to skip, 1 => nothing is skipped, increasing this decreases number of points plotted improving performance
 	cfg.decimate_factor int32 = 1
+
+	% X-axis domain mode ("velocity" or "freq"). if its velocity, given input will be flipped
+	cfg.x_axis_type string = "velocity"
 end
 
 
@@ -55,6 +58,10 @@ if cfg.decimate_factor > 1
 	spectrum = spectrum(:, 1:cfg.decimate_factor:end);
 end
 
+
+if cfg.x_axis_type == "velocity"
+	spectrum = fliplr(spectrum);
+end
 %%% Amplitude scaling.
 % This finds the correct scale so that a waveform entirely fits in its given y range. amplitude_scaling does further scaling
 plot_dy = y_ticks(2) - y_ticks(1); % assume uniform tick size
@@ -118,5 +125,10 @@ if cfg.peak_marker ~= "" && cfg.marker_size > 0
 		MarkerSize      = cfg.marker_size ...
 		);
 end
+xlabel("Doppler " + cfg.x_axis_type + " (m/s)");
+ylabel('Altitude (km)');
+
+xlim([min(x_ticks), max(x_ticks)]);
+ylim([min(y_ticks)-cfg.amplitude_scale, max(y_ticks) + cfg.amplitude_scale]);
 
 end

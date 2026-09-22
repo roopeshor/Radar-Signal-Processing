@@ -2,7 +2,7 @@
 % and then runs the standard spectrum and moments processing pipeline.
 
 nRangeBins = 173;
-[z, u, v, w] = generate_wind_profile(nRangeBins=nRangeBins, qbo_u=10, qbo_v=10);
+[z, u, v, w] = generate_wind_profile(nRangeBins=nRangeBins);
 
 vel_factor = 3.0e8 / 205e6 / 2.0;
 DBS_Factor_V = vel_factor;
@@ -10,13 +10,13 @@ DBS_Factor_H = vel_factor / (2 * sind(10));
 
 obs = utils.create_synthetic_observation(...
 	u, v, w,...
-	SNR          = 10 .^ (linspace(100, -100, nRangeBins)/10), ...
-	spec_w       = 0.1,                       ...
+	SNR          = 10 .^ (linspace(20, -20, nRangeBins)/10), ...
+	spec_w       = 0.9,                       ...
 	add_iq_noise = true ...
 	);
-obs = utils.fill_spectras(obs, @simple.compute_spectra);
+obs = utils.fill_spectras(obs, @ime.compute_spectra);
 obs = simple.HS_denoise_all_beams(obs);
-obs = utils.fill_moments(obs, @simple.compute_moments);
+obs = utils.fill_moments(obs, @ime.compute_moments);
 
 N = obs.north;
 S = obs.south;
@@ -50,7 +50,7 @@ for i = 3:5
 	subplot(1,3, pli);
 	pli = pli+1;
 	% already normalized
-	obs_d = obs.(d).spectra;
+	obs_d = obs.(d).denoised_spectra;
 	% the imagesec plots things as it is and sets the xlim
 	% since x limit is velocity (based on fd * DBS_V)
 	% the moments must also be scaled by DBS_V
