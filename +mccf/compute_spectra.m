@@ -1,4 +1,4 @@
-function spectra = compute_spectra(beam)
+function spectra = compute_spectra(beam, cfg)
 % MCCF.COMPUTE_SPECTRA Computes power spectra using Mutual Cross-Correlation Function (MCCF).
 %
 %   Processes complex IQ time series by applying frequency-domain DC clutter masking,
@@ -10,6 +10,9 @@ function spectra = compute_spectra(beam)
 arguments (Input)
 	% Radar beam object containing raw IQ complex time-series cube (BeamData).
 	beam RadarData
+
+	% which axis to take maximum
+	cfg.max_axis = "all"
 end
 arguments (Output)
 	% RangeBins x NFFT matrix of normalized power spectra.
@@ -78,7 +81,7 @@ end
 spectraCube = mean(spectraCube, 3);
 spectra = squeeze(spectraCube);
 
-max_vals = max(spectra, [], 2);
+max_vals = max(spectra, [], cfg.max_axis);
 max_vals(max_vals == 0) = 1;
 spectra = spectra ./ max_vals;
 end
