@@ -12,7 +12,7 @@ arguments (Input)
 	beam RadarData
 
 	% which axis to take maximum
-	cfg.max_axis = "all"
+	cfg.max_axis = 2
 end
 arguments (Output)
 	% RangeBins x NFFT matrix of normalized power spectra.
