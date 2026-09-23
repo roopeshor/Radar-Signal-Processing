@@ -32,9 +32,11 @@ classdef Observation
 	end
 
 	methods
-		function obs = Observation(stuff)
+		function obs = Observation(stuff, cfg)
 			arguments
 				stuff = ''
+				cfg.add_mmts logical = true
+				cfg.add_uvw logical = true
 			end
 			is_str = isa(stuff, "string") || isa(stuff, "char");
 			if nargin == 0 || (is_str && stuff == "")
@@ -52,7 +54,12 @@ classdef Observation
 				end
 
 				raw      = utils.read_raw_file(obs.raw_filepath);
-				ref_data = utils.add_reference_data(raw, obs.raw_filepath, add_mmts=true, add_uvw=true);
+				ref_data = utils.add_reference_data(...
+					raw,...
+					obs.raw_filepath,...
+					add_mmts=cfg.add_mmts,...
+					add_uvw=cfg.add_uvw...
+					);
 
 				obs.north    = ref_data.beam_struct.north;
 				obs.east     = ref_data.beam_struct.east;

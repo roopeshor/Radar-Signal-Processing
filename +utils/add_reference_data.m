@@ -35,16 +35,16 @@ beam_struct = struct( ...
 for i = 1:5
 	beam = beams(i);
 	direction = beam.direction;
+	beam.ref_height = [];
+	beam.ref_M0 = [];
+	beam.ref_M1 = [];
+	beam.ref_M2 = [];
+	beam.ref_SNR = [];
+	beam.ref_noise_level = [];
 	if options.add_mmts
 		path = fullfile(folder, basename + options.mmts_file_ext.(direction));
 		if ~isfile(path)
 			warning(path + " not found, returning empty array");
-			beam.ref_height = [];
-			beam.ref_M0 = [];
-			beam.ref_M1 = [];
-			beam.ref_M2 = [];
-			beam.ref_SNR = [];
-			beam.ref_noise_level = [];
 		else
 			output = readtable( ...
 				path, ...
@@ -59,8 +59,8 @@ for i = 1:5
 			beam.ref_noise_level = output.("Noise Level (dBm)");
 
 		end
-		beam_struct.(direction) = beam;
 	end
+	beam_struct.(direction) = beam;
 
 	height = [];
 	U = [];
