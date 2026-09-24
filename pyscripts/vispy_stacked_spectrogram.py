@@ -62,7 +62,7 @@ _PARULA_DATA = np.array([
     [0.9636, 0.5491, 0.0356], [0.9659, 0.5402, 0.0487],
 ])
 
-_parula_cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
+_parula_cmap = mcolors.LinearSegmentedColormap.from_list(
     'parula', _PARULA_DATA, N=256)
 matplotlib.colormaps.register(_parula_cmap, force=True)
 
@@ -103,7 +103,7 @@ def to_str(v, default=''):
     except Exception:
         return str(default)
 
-def parse_color(c, default=(0.0, 0.0, 0.0, 1.0)):
+def parse_color(c, default=(0.0, 0.0, 0.0, 1.0)) -> tuple:
     """Parse any MATLAB color representation to an RGBA tuple."""
     if c is None:
         return default
@@ -175,7 +175,7 @@ def render_stacked_spectrogram(mat_path):
 
     cfg = data.get('cfg', None)
 
-    def get_val(key, default):
+    def get_val(key, default) -> str:
         if cfg is not None and cfg.dtype.names and key in cfg.dtype.names:
             return cfg[key][0, 0]
         return default
