@@ -1,5 +1,5 @@
 function new_beam = remove_dc(beam)
-%ime.remove_dc  Removes ground clutter (DC bin) by linear interpolation.
+%ime.remove_dc  Removes ground clutter (DC bin) by interpolation
 arguments (Input)
 	beam RadarData
 end
@@ -14,11 +14,7 @@ elseif ~isempty(beam.spectra)
 else
 	error('Beam spectra is empty.');
 end
-beam.denoised_spectra = remove_dc_matrix(Praw);
-new_beam = beam;
-end
 
-function spectra = remove_dc_matrix(Praw)
 [num_bins, nfft] = size(Praw);
 spectra = Praw;
 dc_idx = floor(nfft / 2) + 1;
@@ -33,4 +29,7 @@ for r = 1:num_bins
 	end
 	spectra(r, :) = spec_r;
 end
+
+beam.denoised_spectra = spectra;
+new_beam = beam;
 end

@@ -9,6 +9,7 @@ arguments (Output)
 	clean_spectra (:, 1024) double
 	noise_level (1, :) double
 end
+
 clean_spectra = movmean(spectra, 5, 2);
 
 noise_level = ime.HS_noise_estimate(clean_spectra, M);

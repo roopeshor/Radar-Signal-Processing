@@ -25,6 +25,8 @@ for r = 1:numRangeBins
 	valid = find(Rn > 1);
 
 	if isempty(valid)
+		% No statistically valid noise region.
+		% fallback: lowest few spectral points.
 		k = max(1, round(0.1 * N));
 	else
 		k = max(valid);
