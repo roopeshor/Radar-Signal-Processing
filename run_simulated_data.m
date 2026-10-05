@@ -2,7 +2,7 @@
 % and then runs the standard spectrum and moments processing pipeline.
 
 nRangeBins = 173;
-[z, u, v, w] = generate_wind_profile(nRangeBins=nRangeBins);
+[z, u, v, w] = wind_synth.generate_wind_profile(nRangeBins=nRangeBins);
 
 vel_factor = 3.0e8 / 205e6 / 2.0;
 DBS_Factor_V = vel_factor;
@@ -50,7 +50,7 @@ for i = 3:5
 	subplot(1,3, pli);
 	pli = pli+1;
 	% already normalized
-	obs_d = obs.(d).denoised_spectra;
+	obs_d = obs.(d).spectra;
 	% the imagesec plots things as it is and sets the xlim
 	% since x limit is velocity (based on fd * DBS_V)
 	% the moments must also be scaled by DBS_V
