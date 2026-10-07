@@ -24,11 +24,9 @@ v_cross = sqrt(u.^2 + v.^2 + w.^2 - v_radial.^2);
 % Vertical shear broadening across gate width
 dv_dz = abs(gradient(v_radial, dz_m));
 sigma_shear = (dv_dz .* dz_m) / sqrt(12);
-
 % Antenna beam broadening (finite one-way beamwidth)
 theta_3db = deg2rad(3.3);
 sigma_beam = (theta_3db / (2 * sqrt(2 * log(2)))) * abs(v_cross);
-
 % turbulence
 sigma_turb_base = sigma_turb_base * ones(1, N_gates); % [m/s]
 

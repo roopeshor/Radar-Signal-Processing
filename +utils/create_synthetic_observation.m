@@ -12,7 +12,7 @@ arguments (Input)
 	% Vertical wind profile vector (m/s).
 	w (1, :) double
 	% Custom header property overrides.
-	cfg.headerFields = struct()
+	cfg.headerFields (1, 5) BeamHeader
 	cfg.altitudeRange = "middle"
 	% Destination filepath to save synthetic .raw binary file.
 	cfg.filepath string = ""
@@ -29,8 +29,8 @@ arguments (Input)
 	cfg.dc_rel_power double = 0
 	% list of height bin and bright band widths per peam
 	cfg.bright_bands struct = struct([])
-	cfg.sigma_turb_base (1, 1) double = 0.2
-	cfg.sigma_chi (1, 1) double = 0.2
+	cfg.sigma_turb_base (1, 1) double = 0
+	cfg.sigma_chi (1, 1) double = 0.1
 end
 arguments (Output)
 	% Synthesized Observation object populated with 5 beams and reference profiles.
@@ -38,15 +38,14 @@ arguments (Output)
 end
 
 Headers = RadarData.empty(0, 5);
-H = utils.create_synthetic_beamheader(headerFields=cfg.headerFields);
+H = cfg.headerFields(1);
 range_res = 3e8 * (H.m_fBaudLength_us * 1e-6) / 2;
 z = H.m_fWindow1StartHeight + (0:H.m_sNumOfRangeBins-1)' * range_res;
 
 DBS_V = 3.0e8 / 205e6 / 2.0;
 
 for k = 1:5
-	cfg.headerFields.m_sCurrentBeamCnt = k - 1;
-	H = utils.create_synthetic_beamheader(headerFields=cfg.headerFields, altitudeRange=cfg.altitudeRange);
+	H = cfg.headerFields(k);
 	Headers(k) = RadarData(H);
 	vr = utils.compute_radial_velocity(u, v, w, H.m_fAzimuth, H.m_fOffZenith);
 	sv = cfg.sigma_v;

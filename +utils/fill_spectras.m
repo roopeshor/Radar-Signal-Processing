@@ -16,7 +16,7 @@ new_obs = obs;
 directions = ["north", "east", "west", "south", "vertical"];
 
 for dir = directions
-	new_obs.(dir).spectra = fx(obs.(dir));
-	new_obs.(dir).denoised_spectra = new_obs.(dir).spectra;
+	new_obs.(dir).spectra = utils.get_original_spectrum(obs.(dir));
+	new_obs.(dir).denoised_spectra = fx(obs.(dir));
 end
 end
