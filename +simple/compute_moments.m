@@ -16,7 +16,6 @@ end
 
 ipp_us = beam.ipp_us;
 n_coh = beam.n_coh;
-
 if ~isempty(beam.denoised_spectra)
 	P_filtered = beam.denoised_spectra;
 else
@@ -28,6 +27,7 @@ end
 M0 = zeros(1, height_bins);
 M1 = zeros(1, height_bins);
 M2 = zeros(1, height_bins);
+SNR = zeros(1, height_bins);
 
 for i = 1:height_bins
 	P = P_filtered(i, :);
@@ -52,10 +52,12 @@ for i = 1:height_bins
 
 	M1(i) = sum(signal_block .* freq) / M0(i);
 	M2(i) = sum(((freq - M1(i)) .^ 2) .* signal_block) / M0(i);
+	SNR(i) = sum(((freq - M1(i)) .^ 3) .* signal_block) / M0(i);
 end
 
 beam.M0 = M0;
 beam.M1 = M1;
 beam.M2 = M2;
+beam.SNR = SNR;
 new_beam = beam;
 end
