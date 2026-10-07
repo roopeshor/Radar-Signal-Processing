@@ -15,8 +15,8 @@ arguments (Output)
 	w_gw (1, :) double
 end
 % Continuous Gravity Wave Spectrum
-z = h(:);
-N = length(z);
+h = h';
+N = length(h);
 
 m_wavenumbers = linspace(2*pi/cfg.gw_max_lambda, 2*pi/0.4, cfg.gw_nmodes)';
 phases_u = rand(cfg.gw_nmodes, 1) * 2 * pi;
@@ -28,11 +28,11 @@ E_m = E_m / sum(E_m);
 u_wave_spec = zeros(N, 1);
 v_wave_spec = zeros(N, 1);
 for i = 1:cfg.gw_nmodes
-	u_wave_spec = u_wave_spec + sqrt(E_m(i)) * cos(m_wavenumbers(i) * z + phases_u(i));
-	v_wave_spec = v_wave_spec + sqrt(E_m(i)) * sin(m_wavenumbers(i) * z + phases_v(i));
+	u_wave_spec = u_wave_spec + sqrt(E_m(i)) * cos(m_wavenumbers(i) * h + phases_u(i));
+	v_wave_spec = v_wave_spec + sqrt(E_m(i)) * sin(m_wavenumbers(i) * h + phases_v(i));
 end
 
-amp_growth = exp(z / (2 * cfg.lw_Hs)) .* exp(-z / cfg.gw_damp_scale);
+amp_growth = exp(h / (2 * cfg.lw_Hs)) .* exp(-h / cfg.gw_damp_scale);
 u_gw = (cfg.gw_amp * (u_wave_spec / std(u_wave_spec)) .* amp_growth)';
 v_gw = (cfg.gw_amp * (v_wave_spec / std(v_wave_spec)) .* amp_growth)';
 w_gw = -cfg.gw_cf * u_gw;
