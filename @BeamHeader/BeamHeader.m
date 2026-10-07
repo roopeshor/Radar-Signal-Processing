@@ -64,7 +64,7 @@ classdef BeamHeader
 			end
 
 			% apply given data if its BeamHeader or struct
-			if class(cfg) == "BeamHeader" || class(cfg) == "struct"
+			if class(cfg) == "BeamHeader" || class(cfg) == "RadarData" || class(cfg) == "struct"
 				bhf = properties("BeamHeader");
 				for i = 1:length(bhf)
 					if isfield(cfg, bhf{i}) || isprop(cfg, bhf{i})

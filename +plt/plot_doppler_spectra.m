@@ -1,5 +1,5 @@
 function plot_doppler_spectra(cfg)
-% UTILS.PLOT_DOPPLER_SPECTRA Renders range-Doppler spectrographs with overlaid computed and reference moments.
+% plt.plot_doppler_spectra Renders range-Doppler spectrographs with overlaid computed and reference moments.
 
 arguments (Input)
 	% Power spectra matrix (RangeBins x NFFT).

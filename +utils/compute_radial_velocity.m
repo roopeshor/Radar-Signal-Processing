@@ -1,5 +1,5 @@
 function vr = compute_radial_velocity(u, v, w, az, oz)
-% UTILS.COMPUTE_RADIAL_VELOCITY Projects 3D wind velocity vector (u, v, w) along the radar beam direction.
+% Projects 3D wind velocity vector (u, v, w) along the radar beam direction.
 %
 %   Calculates line-of-sight radial velocity vr = (u*sin(az) + v*cos(az))*sin(oz) + w*cos(oz)
 %   given azimuth angle az (degrees) and off-zenith angle oz (degrees).

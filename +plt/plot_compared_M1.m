@@ -1,5 +1,5 @@
 function plot_compared_M1(calc, ref, idx, heights, title_, plots)
-% UTILS.PLOT_COMPARED_M1 Plots calculated vs reference wind velocity profiles against altitude.
+% plt.plot_compared_M1 Plots calculated vs reference wind velocity profiles against altitude.
 
 arguments (Input)
 	% Computed velocity profile vector.

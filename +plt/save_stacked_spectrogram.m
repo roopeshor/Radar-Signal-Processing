@@ -1,6 +1,6 @@
 function save_stacked_spectrogram(spectrum, y_ticks, x_ticks, cfg)
-	% save_stacked_spectrogram stacked spectrogram plotter and PNG exporter usinh VisPy backend .
-	% Drop-in replacement for stacked_spectrogram.m
+	% plt.save_stacked_spectrogram stacked spectrogram plotter and PNG exporter usinh VisPy backend .
+	% Drop-in replacement for plt.stacked_spectrogram.m
 
 arguments
 	spectrum (:, :) double
@@ -53,7 +53,7 @@ arguments
 	cfg.export_dpi double = 700
 
 	% Export path for generated PNG file
-	cfg.export_path string = "plots/stacked_spectrogram.png"
+	cfg.export_path string = "plots/plt.stacked_spectrogram.png"
 
 	% Background color of plot. Can be a color name (e.g. "white", "black") or [R G B] triplet
 	cfg.bg_color = "#111"
@@ -80,10 +80,9 @@ if ~exist(python_bin, 'file')
 	python_bin = "python3";
 end
 script_dir = fileparts(mfilename('fullpath'));
-py_script = fullfile(script_dir, "pyscripts/vispy_stacked_spectrogram.py");
+py_script = fullfile(script_dir, "vispy_stacked_spectrogram.py");
 port = 28290;
 
-connected = false;
 try
 	t = tcpclient('127.0.0.1', port, 'Timeout', 30.0);
 	connected = true;

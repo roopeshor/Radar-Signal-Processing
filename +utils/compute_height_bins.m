@@ -1,5 +1,5 @@
-function ranges = compute_height_ranges(start_range, end_range, num_range_bins)
-% UTILS.COMPUTE_HEIGHT_RANGES Computes linearly spaced altitude bin values across observation windows.
+function ranges = compute_height_bins(start_range, end_range, num_range_bins)
+% UTILS.compute_height_bins Computes linearly spaced altitude bin values across observation windows.
 
 arguments (Input)
 	% Starting observation window height (km or m).

@@ -44,7 +44,7 @@ if isempty(cfg.SNR)
 end
 
 if isempty(cfg.sigma_dc)
-	cfg.sigma_dc = (randn(1, nRangeBins)  + 4) / 12;
+	cfg.sigma_dc = (randn(1, nRangeBins)  + 1) / 12;
 end
 f = linspace(-PRF_eff/2, PRF_eff/2 - PRF_eff/NFFT, NFFT);
 BeamData = zeros(nRangeBins, NFFT, 1);

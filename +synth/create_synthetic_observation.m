@@ -57,7 +57,7 @@ for k = 1:5
 	if (isfield(cfg.bright_bands, Headers(k).direction))
 		bb = cfg.bright_bands.(Headers(k).direction);
 	end
-	Headers(k).BeamData = utils.synthesize_iq_data(...
+	Headers(k).BeamData = synth.synthesize_iq_data(...
 		vr           = vr,              ...
 		Header       = H,               ...
 		spec_w       = sv,      ...
@@ -69,8 +69,7 @@ for k = 1:5
 		);
 end
 
-if cfg.filepath ~= ""; utils.write_raw_file(Headers, cfg.filepath); end
-
+if cfg.filepath ~= ""; io.write_raw_file(Headers, cfg.filepath); end
 obj = Observation(Headers);
 
 obj.ref_height = z;

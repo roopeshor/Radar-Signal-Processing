@@ -49,7 +49,7 @@ w = V_V;
 V_radial = [V_V; V_N; V_E; V_S; V_W];
 spectra_all = {V.spectra; N.spectra; E.spectra; S.spectra; W.spectra};
 
-vel_axis = utils.compute_velocity_axis(N);
+vel_axis = utils.compute_velocity_bins(N);
 delta_R = 299792458 * N.m_fBaudLength_us * 1e-6 / 2;
 altitudes = (0:(numRangeBins-1)) * delta_R;
 end

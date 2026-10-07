@@ -1,5 +1,5 @@
 function stacked_spectrogram(spectrum, y_ticks, x_ticks, cfg)
-	%stacked_spectrogram  creates a stacked spectrogram.
+	%plt.stacked_spectrogram  creates a stacked spectrogram.
 	%    It can render plots with single color or gradient according to function value
 	%    Optionally it can also mark max peak in each graph, and a reference line at given point
 

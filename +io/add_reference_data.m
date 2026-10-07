@@ -1,5 +1,5 @@
 function out = add_reference_data(beams, filepath, options)
-% UTILS.ADD_REFERENCE_DATA Attaches benchmark reference moments (.mmts) and UVW wind profiles (.uvw) to radar beams.
+% io.add_reference_data Attaches benchmark reference moments (.mmts) and UVW wind profiles (.uvw) to radar beams.
 %
 %   Parses reference text files matching the observation base filename, populating reference moment fields
 %   (ref_M0, ref_M1, ref_M2, ref_SNR, ref_noise_level) on each beam and extracting reference wind vectors (U, V, W).

@@ -12,9 +12,11 @@ classdef RadarData < BeamHeader
 		% ---- aliases -------------
 		ipp_us                (1, 1) double  % m_fIntrPulsePeriod_us
 		n_coh                 (1, 1) double  % m_sNumOfCohIntegrations
+		in_coh                (1, 1) double  % m_sNumOfInCohIntegrations
 		start_height          (1, 1) double  % m_fWindow1StartHeight
 		end_height            (1, 1) double  % m_fWindow1EndHeight
 		nRangeBins            (1, 1) double  % m_sNumOfRangeBins
+		nFFT                  (1, 1) double  % m_sNFFT
 
 
 		% --- Post-processing fields ---------
@@ -49,10 +51,12 @@ classdef RadarData < BeamHeader
 		function obj = init_parms(obj)
 			obj.ipp_us = obj.m_fIntrPulsePeriod_us;
 			obj.n_coh = obj.m_sNumOfCohIntegrations;
+			obj.in_coh = obj.m_sNumOfInCohIntegrations;
 			obj.start_height = obj.m_fWindow1StartHeight;
 			obj.end_height = obj.m_fWindow1EndHeight;
 			obj.direction = Data.aoz2dir(az=obj.m_fAzimuth, oz=obj.m_fOffZenith);
 			obj.nRangeBins = obj.m_sNumOfRangeBins;
+			obj.nFFT = obj.m_sNFFT;
 
 			obj.algorithm_parameters = struct();
 		end

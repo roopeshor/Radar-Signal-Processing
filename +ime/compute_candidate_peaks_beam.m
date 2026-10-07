@@ -23,7 +23,7 @@ if isempty(noise_level)
 	noise_level = ime.HS_noise_estimate(spectra, beam.m_sNumOfInCohIntegrations);
 end
 
-vel_axis = utils.compute_velocity_axis(beam);
+vel_axis = utils.compute_velocity_bins(beam);
 candidate_peaks = ime.compute_candidate_peaks(spectra, noise_level, vel_axis);
 
 if ~isstruct(beam.algorithm_parameters)

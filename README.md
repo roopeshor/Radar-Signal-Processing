@@ -3,64 +3,29 @@ ST Radar wind profile estimation algorithms in NEWS+Z directions.
 
 ## Folder structure
 
-All class of algorithm are organized into package directories prefixed with `+` (matlab's convention). All functions within a algorithm are put in this folder.
+A group of algorithms related to a method are organized into package directories prefixed with `+` (matlab's convention).
 
 ```
-├── run_ime.m                     <-- IME run script
-├── run_obs_data.m                <-- MCCF and simple algorithm tester
-├── run_ref_match_test.m          <-- checks if reference M1 can be used to compute uvw
-├── run_resynthesized_data.m      <-- checks if synthesizer can generate new observation from uvw of existing
-├── run_simulated_data.m          <-- plots output of randomly synthesized raw data
-│
-├── +ime                          <-- IME algorithm package
-│   ├── compute_spectra.m              |
-│   ├── remove_dc.m                    |
-│   ├── remove_dc_from_beams.m         |
-│   ├── HS_noise_estimate.m            |
-│   ├── denoiser.m                     |
-│   ├── denoise_all_beams.m            |
-│   ├── adaptive_peak_selection.m      |
-│   ├── profile_tracer.m               |
-│   ├── compute_moments.m              |
-│   └── compute_uvw.m                  |
-│
-├── +st                                <-- tried to match ST radar moment estimator
-│   ├── compute_spectra.m              │
-│   └── compute_moments.m              │   HS noise + 3-point parabolic peak interpolation
-│
-├── +mccf                              <-- Mutual convolution Cost Function package
-│   ├── compute_spectra.m              │
-│   └── compute_moments.m              │
-│
-├── +simple                            <-- Baseline Doppler processing package
-│   ├── compute_spectra.m              │
-│   ├── compute_moments.m              │
-│   ├── HS_denoise_beam.m              │
-│   ├── HS_denoise_all_beams.m         │
-│   └── HS_noise_estimate.m            │
-│
-├── +utils                             <-- Shared utility functions
-│   ├── add_reference_data.m           │ Attaches reference .mmts and .uvw data to Observation objects
-│   ├── compute_height_ranges.m        │ Altitude range bin generator
-│   ├── compute_max_freq.m             │ calculates unambiguous Doppler velocity (V_max)
-│   ├── compute_radial_velocity.m      │ projects uvw to partiular direction
-│   ├── compute_velocity_axis.m        │ Generates Doppler velocity axis (-V_max...+V_max) (m/s)
-│   ├── create_synthetic_observation.m | Synthesizes artifical Observation objects
-│   ├── create_synthetic_beamheader.m  | Synthesizes beam header
-│   ├── fill_moments.m                 │ Batch moment function applier for Observation
-│   ├── fill_spectras.m                │ Batch spectra function applier for Observation
-│   ├── read_raw_file.m                │ Binary .raw radar file parser
-│   ├── synthesize_iq_data.m           │ synthesizes IQ data from radial velocity (Zrnic method)
-│   └── write_raw_file.m               │ Binary .raw radar file serializer
-│
-├── stacked_spectrogram.m          <-- Stacked doppler spectrum plotter
-├── generate_wind_profile.m        <-- generates a artifical wind profile using combination of models.
-├── @Observation                   <-- Value class representing a 5-beam observation dataset along with other properties
-├── @RadarData                     <-- Extension of BeamHeader holding raw IQ data & other fields
-├── @BeamHeader                    <-- Base class for 52 radar header fields
-├── @Data                          <-- Conversion functions and constants
-│
-└── Data                           <-- Folder containing actual radar data
+├── @BeamHeader/BeamHeader.m    |
+├── @Data/Data.m                |
+├── @Observation/Observation.m  ├ Data Structures & constants
+├── @RadarData/RadarData.m      |
+|
+├── +ime      |
+│   └── ...   |
+├── +mccf     |
+│   └── ...   |
+├── +simple   ├ Methods
+│   └── ...   |
+├── +st       |
+│   └── ...   |
+|
+├── +synth     <- Related to synthesis of radar data
+├── +io        <- File I/O
+├── +plt       <- Data plotters
+├── +utils     <- Other utilities
+|
+├── run_xyz.m  <- run scripts
 ```
 
 The data is assumed to be in `Data` folder,

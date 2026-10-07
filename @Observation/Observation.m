@@ -21,7 +21,8 @@ classdef Observation
 		ref_V (1, :) double
 		ref_W (1, :) double
 
-		heights (1, :) double % computed heights from @utils.compute_height_ranges
+		heights (1, :) double % computed heights from @utils.compute_height_bins
+		velocities (1, :) double % computed velocities from @utils.compute_velocity_bins
 
 		% DBS factors [m]: scaling factor to convert Doppler frequencies (Hz) into wind velocities (m/s).
 		% Horizontal DBS factor = λ/(2sin(oz))
@@ -35,6 +36,9 @@ classdef Observation
 		start_height (1, 1) double % start height from one of the beams
 		end_height (1, 1) double % end height from one of the beams
 		nRangeBins (1, 1) double % number of range bins
+		ipp_us (1, 1) double % Intr Pulse Period in microseconds
+		in_coh (1, 1) double % ncoherent integrations
+		nFFT (1, 1) double % number of FFT bins
 	end
 
 	methods
@@ -59,8 +63,8 @@ classdef Observation
 					obs.raw_filepath = stuff + ".raw";
 				end
 
-				raw      = utils.read_raw_file(obs.raw_filepath);
-				ref_data = utils.add_reference_data(...
+				raw      = io.read_raw_file(obs.raw_filepath);
+				ref_data = io.add_reference_data(...
 					raw,...
 					obs.raw_filepath,...
 					add_mmts=cfg.add_mmts,...
@@ -97,10 +101,14 @@ classdef Observation
 			obs.start_height = obs.north.start_height;
 			obs.end_height = obs.north.end_height;
 			obs.nRangeBins = obs.north.nRangeBins;
-			obs.heights = utils.compute_height_ranges(...
+			obs.nFFT = obs.north.nFFT;
+			obs.ipp_us = obs.north.ipp_us;
+			obs.in_coh = obs.north.in_coh;
+			obs.heights = utils.compute_height_bins(...
 				obs.start_height, ...
 				obs.end_height, ...
 				obs.nRangeBins);
+			obs.velocities = utils.compute_velocity_bins(obs.nFFT, obs.ipp_us, obs.in_coh);
 		end
 
 		function obs = compute_moments_with(obs, fx)

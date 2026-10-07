@@ -1,5 +1,5 @@
 function Header = read_raw_file(filepath)
-% UTILS.READ_RAW_FILE Binary parser for ST radar (.raw) experimental data files.
+% io.read_raw_file Binary parser for ST radar (.raw) experimental data files.
 %
 %   Reads 1024-byte binary header blocks and 32-bit complex IQ time series data for all beams,
 %   constructing an array of RadarData objects populated with beam metadata and BeamData cubes.

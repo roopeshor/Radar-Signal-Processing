@@ -291,7 +291,7 @@ def render_stacked_spectrogram(mat_path):
     decimate_factor    = to_int(get_val('decimate_factor',       1))
     x_axis_type        = to_str(get_val('x_axis_type',           'velocity'))
     export_dpi         = to_float(get_val('export_dpi',          700.0))
-    export_path        = to_str(get_val('export_path',           'plots/stacked_spectrogram.png'))
+    export_path        = to_str(get_val('export_path',           'plots/plt.stacked_spectrogram.png'))
     bg_color_raw       = get_val('bg_color',                     'white')
 
     # ── Preprocess data ────────────────────────────────────────────────────────
