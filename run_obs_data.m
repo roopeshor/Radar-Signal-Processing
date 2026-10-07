@@ -1,13 +1,13 @@
 % put base file name here (without file extension)
-filepath = fullfile("Data", "rain", "EXP_DBS_CH4_28Jun2026_14_28_16");
+filepath = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_17_22_12");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
 
 %% MCCF Method
-obs = utils.fill_spectras(obs, @mccf.compute_spectra);
-obs = simple.HS_denoise_all_beams(obs);
-obs = utils.fill_moments(obs, @mccf.compute_moments);
+obs = utils.fill_spectras(obs, @simple.compute_spectra);
+% obs = simple.HS_denoise_all_beams(obs);
+obs = utils.fill_moments(obs, @simple.compute_moments);
 
 % obs = utils.fill_spectras(obs, @simple.compute_spectra);
 % obs = simple.HS_denoise_all_beams(obs);
@@ -29,12 +29,11 @@ h = utils.compute_height_ranges(h_start, h_end, N.m_sNumOfRangeBins);
 
 dirs = [N,S,W,E,V];
 
-for i = 1:1
+for i = 1:5
 	d = dirs(i);
-	subplot(1, 1, i);
+	subplot(1, 5, i);
 	utils.plot_doppler_spectra(...
-		spectra   = log10(d.spectra),   ...
-		comp_m    = d.M1 * obs.DBS_Factor_V,     ...
+		spectra   = 10*log10(d.spectra),   ...
 		direction = d.direction,                 ...
 		heights   = h,                           ...
 		x_max     = obs.v_max                    ...
