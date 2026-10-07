@@ -3,7 +3,7 @@ function [clean_spectra, noise_level] = denoise_matrix(spectra, M)
 % also returns computed noise_level
 arguments (Input)
 	spectra (:, 1024) double
-	M (1,1) double % number of incoherent integrations
+	M (1, 1) double % number of incoherent integrations
 end
 arguments (Output)
 	clean_spectra (:, 1024) double

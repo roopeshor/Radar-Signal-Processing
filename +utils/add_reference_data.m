@@ -20,7 +20,7 @@ arguments (Input)
 end
 arguments (Output)
 	% Struct containing beam_struct, reference U, V, W wind vectors, and height array.
-	out (1,1) struct
+	out (1, 1) struct
 end
 
 beam_struct = struct( ...

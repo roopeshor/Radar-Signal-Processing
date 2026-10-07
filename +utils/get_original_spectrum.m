@@ -1,4 +1,5 @@
 function spectra = get_original_spectrum(beam)
+	% Computes normalized spectrum from given beam with no further processing
 arguments (Input)
 	% Radar beam object containing raw IQ complex time-series cube (BeamData).
 	beam RadarData

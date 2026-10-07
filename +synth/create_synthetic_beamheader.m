@@ -1,5 +1,5 @@
 function H = create_synthetic_beamheader(config)
-% UTILS.CREATE_SYNTHETIC_BEAMHEADER Generates a synthetic BeamHeader object for simulation and testing.
+% synth.create_synthetic_beamheader Generates a synthetic BeamHeader object for simulation and testing.
 %
 %   Constructs default 52-field radar header structures configured for lower (tropospheric),
 %   middle (stratospheric), or upper altitude modes, with optional custom property overrides.

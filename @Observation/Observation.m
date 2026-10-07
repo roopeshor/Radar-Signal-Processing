@@ -21,14 +21,20 @@ classdef Observation
 		ref_V (1, :) double
 		ref_W (1, :) double
 
+		heights (1, :) double % computed heights from @utils.compute_height_ranges
+
 		% DBS factors [m]: scaling factor to convert Doppler frequencies (Hz) into wind velocities (m/s).
 		% Horizontal DBS factor = λ/(2sin(oz))
 		DBS_Factor_H (1, 1) double
 		% Vertical DBS factor = λ/2
 		DBS_Factor_V (1, 1) double
 
-		f_max (1,1) double % maximum frequency deviation in the doppler spectrum
-		v_max (1,1) double % maximum velocity in the doppler spectrum
+		% assumes following parameters are same for all 5 beams
+		f_max (1, 1) double % maximum frequency deviation in the doppler spectrum
+		v_max (1, 1) double % maximum velocity in the doppler spectrum
+		start_height (1, 1) double % start height from one of the beams
+		end_height (1, 1) double % end height from one of the beams
+		nRangeBins (1, 1) double % number of range bins
 	end
 
 	methods
@@ -88,6 +94,29 @@ classdef Observation
 
 			obs.f_max = utils.compute_max_freq(obs.north.ipp_us, obs.north.n_coh);
 			obs.v_max = obs.f_max * vel_factor; % DBS_V
+			obs.start_height = obs.north.start_height;
+			obs.end_height = obs.north.end_height;
+			obs.nRangeBins = obs.north.nRangeBins;
+			obs.heights = utils.compute_height_ranges(...
+				obs.start_height, ...
+				obs.end_height, ...
+				obs.nRangeBins);
 		end
+
+		function obs = compute_moments_with(obs, fx)
+			% Batch applies a moments computating function across all beams in an Observation.
+			for dir = Data.directions
+				obs.(dir) = fx(obs.(dir));
+			end
+		end
+
+		function obs = compute_spectra_with(obs, fx)
+			% Batch applies a spectrum computating function across all beams in an Observation.
+			for dir = Data.directions
+				obs.(dir).spectra = utils.get_original_spectrum(obs.(dir));
+				obs.(dir).denoised_spectra = fx(obs.(dir));
+			end
+		end
+
 	end
 end

@@ -1,5 +1,5 @@
 function write_raw_file(Header, filepath)
-% UTILS.WRITE_RAW_FILE Binary serializer for ST radar (.raw) experimental data files.
+% Binary serializer for ST radar (.raw) experimental data files.
 %
 %   Serializes an array of RadarData objects into standard 1024-byte binary headers and interleaved
 %   32-bit real/imaginary complex IQ time series data blocks.
@@ -8,7 +8,7 @@ arguments (Input)
 	% Array of RadarData beam objects to serialize.
 	Header RadarData
 	% Destination filepath string for the binary .raw file.
-	filepath (1,1) string
+	filepath (1, 1) string
 end
 
 fPtr = fopen(filepath, 'wb');

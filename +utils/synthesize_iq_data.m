@@ -1,5 +1,5 @@
 function BeamData = synthesize_iq_data(cfg)
-% UTILS.SYNTHESIZE_IQ_DATA Synthesizes complex IQ time-series data using Zrnic spectral simulation.
+% Synthesizes complex IQ time-series data using Zrnic spectral simulation.
 %
 %   Generates Gaussian power spectrum signatures modeled on Doppler velocity, spectral width, and SNR,
 %   applies complex Gaussian noise shaping (Zrnic method), and computes inverse FFT to yield IQ time series.

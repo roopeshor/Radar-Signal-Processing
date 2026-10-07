@@ -53,16 +53,18 @@ classdef Data
 			"west"    , "_Beam3_W1_Az_270.00_Oz_10.00.mmts", ...
 			"north"   , "_Beam5_W1_Az_0.00_Oz_10.00.mmts" ...
 		);
+		% directions array
+		directions = ["north", "east", "west", "south", "vertical"];
 	end
 	methods (Static)
 		function dir_str = aoz2dir(cfg)
 			% azimuth and offzenith to direction map
 			arguments (Input)
-				cfg.az (1,1) double
-				cfg.oz (1,1) double
+				cfg.az (1, 1) double
+				cfg.oz (1, 1) double
 			end
 			arguments (Output)
-				dir_str (1,1) string
+				dir_str (1, 1) string
 			end
 
 			if cfg.oz == 0

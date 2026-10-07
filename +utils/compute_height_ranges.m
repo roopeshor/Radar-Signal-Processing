@@ -3,11 +3,11 @@ function ranges = compute_height_ranges(start_range, end_range, num_range_bins)
 
 arguments (Input)
 	% Starting observation window height (km or m).
-	start_range (1,1) double
+	start_range (1, 1) double
 	% Ending observation window height (km or m).
-	end_range (1,1) double
+	end_range (1, 1) double
 	% Total number of range bins.
-	num_range_bins (1,1) double
+	num_range_bins (1, 1) double
 end
 arguments (Output)
 	% Vector of altitude range bin heights.

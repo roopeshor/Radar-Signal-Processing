@@ -4,13 +4,13 @@ filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15.raw");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
-obs = utils.fill_spectras(obs, @simple.compute_spectra);
+obs = obs.compute_spectra_with(@simple.compute_spectra);
 
 u = obs.ref_U;
 v = obs.ref_V;
 w = obs.ref_W;
 
-synth = utils.create_synthetic_observation(u, v, w, headerFields=obs.north);
+synth = synth.create_synthetic_observation(u, v, w, headerFields=obs.north);
 
 disp("Computing Spectra...");
 synth = utils.fill_spectras(synth, @mccf.compute_spectra);

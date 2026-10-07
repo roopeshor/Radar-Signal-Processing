@@ -3,7 +3,7 @@ function noise_level = HS_noise_estimate(spectra, M)
 
 arguments (Input)
 	spectra (:, 1024) double
-	M (1,1) double = 1 % number of incoherent integrations
+	M (1, 1) double = 1 % number of incoherent integrations
 end
 arguments (Output)
 	% [1 x rangeBins] vector of noise levels per range bin

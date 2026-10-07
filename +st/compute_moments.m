@@ -10,7 +10,7 @@ arguments (Input)
 	% Radar beam object containing spectra (or denoised_spectra) and timing parameters.
 	beam RadarData
 	% Number of bins on each side of DC to zero out for clutter notch.
-	options.clutter_notch_bins (1,1) double = 1
+	options.clutter_notch_bins (1, 1) double = 1
 end
 arguments (Output)
 	% Modified RadarData beam populated with M0, M1 (Hz), and M2 profiles.

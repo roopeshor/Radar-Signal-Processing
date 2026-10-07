@@ -122,15 +122,15 @@ Methods (`+ime`, `@mccf`, `@st`, `@simple`) export standardized function handles
 
 ```matlab
 % Example: IME Method (+ime)
-obs = utils.fill_spectras(obs, @ime.compute_spectra);
+obs = obs.compute_spectra_with(@ime.compute_spectra);
 obs = ime.remove_dc_from_beams(obs);
 obs = ime.denoise_all_beams(obs);
-obs = utils.fill_moments(obs, @ime.compute_moments);
+obs = obs.compute_moments_with(@ime.compute_moments);
 
 % Example: MCCF Method (+mccf)
-obs = utils.fill_spectras(obs, @mccf.compute_spectra);
+obs = obs.compute_spectra_with(@mccf.compute_spectra);
 obs = simple.HS_denoise_all_beams(obs);
-obs = utils.fill_moments(obs, @mccf.compute_moments);
+obs = obs.compute_moments_with(@mccf.compute_moments);
 ```
 
 ### Extracting Wind Profiles (DBS Equations)

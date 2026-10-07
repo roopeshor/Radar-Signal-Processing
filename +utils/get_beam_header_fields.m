@@ -1,5 +1,5 @@
 function [keys, vals] = get_beam_header_fields(b, config)
-% UTILS.GET_BEAM_HEADER_FIELDS Extracts binary beam header fields into key-value pairs for metadata inspection.
+% binary beam header fields into key-value pairs for metadata inspection.
 
 arguments (Input)
 	% RadarData beam object.

@@ -6,7 +6,7 @@ function Header = read_raw_file(filepath)
 
 arguments (Input)
 	% Path to binary .raw radar observation file.
-	filepath (1,1) string
+	filepath (1, 1) string
 end
 arguments (Output)
 	% Array of RadarData beam objects (typically 5 beams).
@@ -104,16 +104,6 @@ for beam_No = 1:beam_count
 	Header(beam_No).m_fWindow5StartHeight        = double(typecast(hdrBytes(725:728), 'single'));
 	Header(beam_No).m_fWindow5EndHeight          = double(typecast(hdrBytes(729:732), 'single'));
 
-	Header(beam_No).direction = Data.aoz2dir(...
-		az=Header(beam_No).m_fAzimuth, ...
-		oz=Header(beam_No).m_fOffZenith ...
-		);
-
-	Header(beam_No).ipp_us = Header(beam_No).m_fIntrPulsePeriod_us;
-	Header(beam_No).n_coh = Header(beam_No).m_sNumOfCohIntegrations;
-	Header(beam_No).start_height = Header(beam_No).m_fWindow1StartHeight;
-	Header(beam_No).end_height = Header(beam_No).m_fWindow1EndHeight;
-
 	if Header(beam_No).m_sNumOfInCohIntegrations <= 0
 		Header(beam_No).m_sNumOfInCohIntegrations = 1;
 	end
@@ -124,7 +114,7 @@ for beam_No = 1:beam_count
 	dataBlockSize = nRangeBins * nNFFT;
 
 	Header(beam_No).BeamData = zeros(nRangeBins, nNFFT, nInCoh);
-
+	Header(beam_No) = Header(beam_No).init_parms();
 	for InCohIntegration = 1:nInCoh
 		if InCohIntegration ~= 1
 			[~, headerDataCount] = fread(fPtr, 1024, 'int8');

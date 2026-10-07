@@ -6,9 +6,9 @@ arguments (Input)
 	w (1, :) double
 	v_radial (1, :) double
 	% base turbulance
-	sigma_turb_base (1,1) double = .2
+	sigma_turb_base (1, 1) double = .2
 	% Intermittency severity parameter
-	sigma_chi (1,1) double = 0.2;
+	sigma_chi (1, 1) double = 0.2;
 end
 arguments (Output)
 	%

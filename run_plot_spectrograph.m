@@ -4,7 +4,7 @@ filepath = fullfile("Data" , "rain", "EXP_DBS_CH4_28Jun2026_14_28_16");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath, add_mmts=false, add_uvw=false);
-obs = utils.fill_spectras(obs, @mccf.compute_spectra);
+obs = obs.compute_spectra_with(@mccf.compute_spectra);
 % obs = simple.HS_denoise_all_beams(obs);
 
 data = obs.north.denoised_spectra;

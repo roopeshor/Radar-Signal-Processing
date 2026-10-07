@@ -1,5 +1,5 @@
 function obj = create_synthetic_observation(u, v, w, cfg)
-% UTILS.CREATE_SYNTHETIC_OBSERVATION Synthesizes an Observation object with ground-truth wind profiles.
+% synth.create_synthetic_observation Synthesizes an Observation object with ground-truth wind profiles.
 %
 %   Generates 5-beam IQ data cubes via Zrnic spectral simulation, sets reference moments and wind vector
 %   profiles (u, v, w), and optionally writes out a .raw binary data file.
@@ -50,7 +50,7 @@ for k = 1:5
 	vr = utils.compute_radial_velocity(u, v, w, H.m_fAzimuth, H.m_fOffZenith);
 	sv = cfg.sigma_v;
 	if (class(sv) == "string")
-		sv = utils.compute_spectrum_broadening(z, u, v, w, vr, cfg.sigma_turb_base, cfg.sigma_chi);
+		sv = synth.compute_spectrum_broadening(z, u, v, w, vr, cfg.sigma_turb_base, cfg.sigma_chi);
 	end
 	Headers(k).ref_M1 = - vr / DBS_V;
 	bb = [];

@@ -22,8 +22,8 @@ arguments (Output)
 	altitudes (1, :) double
 end
 
-obs = utils.fill_spectras(obs, @ime.compute_spectra);
-obs = utils.fill_moments(obs, @ime.compute_moments);
+obs = obs.compute_spectra_with(@ime.compute_spectra);
+obs = obs.compute_moments_with(@ime.compute_moments);
 
 N = obs.north;
 S = obs.south;
