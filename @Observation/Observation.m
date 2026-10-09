@@ -111,18 +111,18 @@ classdef Observation
 			obs.velocities = utils.compute_velocity_bins(obs.nFFT, obs.ipp_us, obs.in_coh);
 		end
 
-		function obs = compute_moments_with(obs, fx)
+		function obs = compute_moments_with(obs, fx, varargin)
 			% Batch applies a moments computating function across all beams in an Observation.
 			for dir = Data.directions
-				obs.(dir) = fx(obs.(dir));
+				obs.(dir) = fx(obs.(dir), varargin{:});
 			end
 		end
 
-		function obs = compute_spectra_with(obs, fx)
+		function obs = compute_spectra_with(obs, fx, varargin)
 			% Batch applies a spectrum computating function across all beams in an Observation.
 			for dir = Data.directions
 				obs.(dir).spectra = utils.get_original_spectrum(obs.(dir));
-				obs.(dir).denoised_spectra = fx(obs.(dir));
+				obs.(dir).denoised_spectra = fx(obs.(dir), varargin{:});
 			end
 		end
 
