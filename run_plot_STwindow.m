@@ -16,7 +16,7 @@ heights = obs.heights(i1:i2)/1000;
 dspec = N.denoised_spectra(i1:i2, vidx(1):vidx(2));
 spec = N.spectra(i1:i2, vidx(1):vidx(2));
 compm = M(i1:i2);
-refm = N.ref_M1(i1:i2) * obs.DBS_Factor_V;
+refm = N.ref_M1(i1:i2) * obs.DBS_Factor;
 stw = N.algorithm_parameters.mccf_ST_W(i1:i2, :);
 
 plt.plot_doppler_spectra(...

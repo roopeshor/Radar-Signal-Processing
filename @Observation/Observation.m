@@ -28,7 +28,7 @@ classdef Observation
 		% Horizontal DBS factor = λ/(2sin(oz))
 		DBS_Factor_H (1, 1) double
 		% Vertical DBS factor = λ/2
-		DBS_Factor_V (1, 1) double
+		DBS_Factor (1, 1) double
 
 		% assumes following parameters are same for all 5 beams
 		f_max (1, 1) double % maximum frequency deviation in the doppler spectrum
@@ -93,7 +93,7 @@ classdef Observation
 			end
 
 			vel_factor = 3.0e8 / 205e6 / 2.0;
-			obs.DBS_Factor_V = vel_factor;
+			obs.DBS_Factor = vel_factor;
 			obs.DBS_Factor_H = vel_factor / (2 * sind(obs.north.m_fOffZenith));
 
 			obs.f_max = utils.compute_max_freq(obs.north.ipp_us, obs.north.n_coh);

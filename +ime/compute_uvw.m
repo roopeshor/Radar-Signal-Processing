@@ -32,7 +32,7 @@ W = obs.west;
 V = obs.vertical;
 
 numRangeBins = N.m_sNumOfRangeBins;
-vel_factor = obs.DBS_Factor_V;
+vel_factor = obs.DBS_Factor;
 
 V_N = - N.M1 * vel_factor;
 V_S = - S.M1 * vel_factor;

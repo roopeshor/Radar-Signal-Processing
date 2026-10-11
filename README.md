@@ -114,7 +114,7 @@ calc_V = -(N.M1 - S.M1) * obs.DBS_Factor_H;
 % Vertical Wind (W)
 c_th = cosd(N.m_fOffZenith);
 sum_M1 = E.M1 + W.M1 + N.M1 + S.M1;
-calc_W = -obs.DBS_Factor_V * (c_th * sum_M1 + V.M1) / (4 * c_th^2 + 1);
+calc_W = -obs.DBS_Factor * (c_th * sum_M1 + V.M1) / (4 * c_th^2 + 1);
 ```
 
 ## More about architecture
