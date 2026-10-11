@@ -29,8 +29,8 @@ y_bounds = [min(cfg.heights), max(cfg.heights)];
 legnds = [];
 if cfg.x_axis_type == "velocity"
 	cfg.spectra = fliplr(cfg.spectra);
-	cfg.comp_m = -cfg.comp_m;
-	cfg.ref_m = -cfg.ref_m;
+	cfg.comp_m = cfg.comp_m;
+	cfg.ref_m = cfg.ref_m;
 end
 
 imagesc(x_bounds, y_bounds, cfg.spectra);
