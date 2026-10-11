@@ -1,6 +1,6 @@
 % Synthesizes raw ST Radar data from a prescribed wind profile
 % and then runs the standard spectrum and moments processing pipeline.
-for exp_idx=11:15
+for exp_idx=16:17
 	disp("============== Exp: " + exp_idx + " ==============")
 
 	alts = ["lower", "middle", "upper"];
@@ -62,7 +62,7 @@ for exp_idx=11:15
 	params.gc_rel_power  = rand() / 200 + 0.0005;
 	params.bands  = bands;
 	params.altitude_range  = altitude_range;
-	obs_mccf = synth.create_synthetic_observation(...
+	obs_base = synth.create_synthetic_observation(...
 		u, v, w,...
 		SNR          = 10 .^ (linspace(50, -35, nRangeBins)/10), ...
 		dc_rel_power = .2,                                     ...
@@ -77,41 +77,44 @@ for exp_idx=11:15
 		);
 	disp("    done synthesis")
 
-	obs_simp = obs_mccf;
-	obs_ime = obs_mccf;
-	obs_hyb = obs_mccf;
-
 	disp("    computing mccf")
+	obs_mccf = obs_base;
 	obs_mccf = obs_mccf.apply_beam_fx(@mccf.compute_all_params, wind_shear=1, win_coeff=2);
+	plt_res(obs_mccf, "mccf", exp_idx, params);
+	clear obs_mccf;
+
+
 	disp("    computing ime")
-	obs_ime = obs_ime.compute_spectra_with(@mccf.compute_spectra);
+	obs_ime = obs_base;
+	obs_ime = obs_ime.compute_spectra_with(@ime.compute_spectra);
 	obs_ime = obs_ime.apply_beam_fx(@ime.denoise_beam);
 	obs_ime = obs_ime.apply_beam_fx(@ime.estimate_params, vel_axis=obs_ime.velocities);
+	plt_res(obs_ime, "ime", exp_idx, params);
+	clear obs_ime;
+
 	disp("    computing simple")
+	obs_simp = obs_base;
 	obs_simp = obs_simp.compute_spectra_with(@simple.compute_spectra);
 	obs_simp = obs_simp.apply_beam_fx(@simple.denoise_beam);
 	obs_simp = obs_simp.apply_beam_fx(@simple.compute_moments);
+	plt_res(obs_simp, "simple", exp_idx, params);
+	clear obs_simp;
+
 	disp("    computing hybrid")
+	obs_hyb = obs_base;
 	obs_hyb = obs_hyb.compute_spectra_with(@mccf.compute_spectra);
 	obs_hyb = obs_hyb.apply_beam_fx(@ime.denoise_beam);
-	obs_hyb = obs_hyb.apply_beam_fx(@ime.estimate_params, vel_axis=obs_ime.velocities);
-
-	plt_res(obs_mccf, "mccf", exp_idx, params, 1);
-	clear obs_mccf;
-	plt_res(obs_ime, "ime", exp_idx, params, 2);
-	clear obs_ime;
-	plt_res(obs_simp, "simple", exp_idx, params, 3);
-	clear obs_simp;
-	plt_res(obs_hyb, "hybrid", exp_idx, params, 4);
-	clear all;
+	obs_hyb = obs_hyb.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb.velocities);
+	plt_res(obs_hyb, "hybrid", exp_idx, params);
+	clear alts stripesD headData altitude_range params h_start h_end nRangeBins nStripes skip_dist perBinCnt bands start_idx sw idxs bds ps obs_* ;
 	close all;
 end
 
-function plt_res(obs_, name_, exp_idx, params, pi)
+function plt_res(obs_, name_, exp_idx, params)
 disp("    plotting " + name_)
 for i = 1:5
 	disp("        p: " + i)
-	f = figure('Visible', 'off', 'Units', "inches", 'Position', [0, 0, 12, 16]);
+	f = figure('Visible', 'off', 'Units', "pixels", 'Position', [0, 0, 800, 1100]);
 	theme(f, 'light');
 	beam = obs_.(Data.directions(i));
 	data = 20*log10(abs(beam.spectra));
@@ -126,14 +129,13 @@ for i = 1:5
 		)
 	colorbar
 	clim([-150,0]);
-	allTextObjects = findall(f, '-property', 'FontSize');
-	set(allTextObjects, 'FontSize', 20);
+	set(groot, 'defaultAxesFontSize', 20)
 	M(isnan(M)) = 0;
 	params.mse = immse(beam.ref_M1 * obs_.DBS_Factor, M);
 	imwrite(getframe(f).cdata, ...
 		"plots/" + exp_idx + "_"+name_+"_" + i + ".png", ...
-		'Comment', jsonencode(params), ...
-		'XResolution', 1000 ...
+		'Comment', jsonencode(params) ...
 		);
+	close(f)
 end
 end
