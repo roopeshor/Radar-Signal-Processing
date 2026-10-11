@@ -22,5 +22,5 @@ lambda = c / fc;
 effective_PRI = ipp * 1e-6 * n_coh;
 
 fd = (-nfft/2 : nfft/2 - 1) / (nfft * effective_PRI);
-vel_axis = -lambda * fd / 2;
+vel_axis = lambda * fd / 2;
 end

@@ -1,24 +1,19 @@
-function [denoised_spectra, noise_level] = HS_denoise_beam(beam)
-% SIMPLE.HS_DENOISE_BEAM Denoises a single RadarData beam by subtracting Hildebrand-Sekhon noise.
-%
-%   Retrieves or estimates the Hildebrand-Sekhon noise level for each range bin, subtracts the
-%   estimated noise floor from the Doppler power spectrum, and zeroes negative spectral intensities.
+function beam = HS_denoise_beam(beam)
+% Denoises a single RadarData beam by subtracting Hildebrand-Sekhon noise.
 
 arguments (Input)
-	% Radar beam object containing spectra and incoherent integration parameters.
 	beam RadarData
 end
 arguments (Output)
-	% RangeBins x NFFT matrix of noise-subtracted power spectra.
-	denoised_spectra (:, 1024) double
-	% Estimated noise level per range bin.
-	noise_level (1, :) double
+	beam RadarData
 end
 
-spec = beam.denoised_spectra;
-if (isempty(spec))
+if isempty(beam.denoised_spectra)
 	spec = beam.spectra;
+else
+	spec = beam.denoised_spectra;
 end
+
 [~, nfft] = size(spec);
 noise_level = beam.noise_level;
 if isempty(noise_level)
@@ -28,4 +23,7 @@ end
 noiseLevelPerBin = repmat(noise_level', 1, nfft);
 denoised_spectra = spec - noiseLevelPerBin;
 denoised_spectra(denoised_spectra < 0) = 0;
+
+beam.noise_level = noise_level;
+beam.denoised_spectra = denoised_spectra;
 end
