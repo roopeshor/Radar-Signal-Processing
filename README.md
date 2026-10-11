@@ -90,12 +90,12 @@ Methods (`+ime`, `@mccf`, `@st`, `@simple`) export standardized function handles
 obs = obs.compute_spectra_with(@ime.compute_spectra);
 obs = ime.remove_dc_from_beams(obs);
 obs = ime.denoise_all_beams(obs);
-obs = obs.compute_moments_with(@ime.compute_moments);
+obs = obs.apply_fx(@ime.compute_moments);
 
 % Example: MCCF Method (+mccf)
 obs = obs.compute_spectra_with(@mccf.compute_spectra);
 obs = simple.HS_denoise_all_beams(obs);
-obs = obs.compute_moments_with(@mccf.compute_moments);
+obs = obs.apply_fx(@mccf.compute_moments);
 ```
 
 ### Extracting Wind Profiles (DBS Equations)
