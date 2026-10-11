@@ -29,7 +29,7 @@ classdef RadarData < BeamHeader
 		SNR                  (1, :) double
 		noise_level          (1, :) double
 
-		algorithm_parameters        struct  % struct to store algorithm specific parameters like cost function scores
+		a_params        struct  % struct to store algorithm specific parameters like cost function scores
 
 		% ---- reference data ---------
 		ref_height           (1, :) double  % given height in the measurement
@@ -58,7 +58,7 @@ classdef RadarData < BeamHeader
 			obj.nRangeBins = obj.m_sNumOfRangeBins;
 			obj.nFFT = obj.m_sNFFT;
 
-			obj.algorithm_parameters = struct();
+			obj.a_params = struct();
 		end
 	end
 end

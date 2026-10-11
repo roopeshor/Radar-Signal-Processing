@@ -28,14 +28,14 @@ alpha =cfg.win_coeff;
 max_shear =cfg.wind_shear;
 dv =cfg.velocity_res;
 
-if (isfield(beam.algorithm_parameters, "alpha"))
-	alpha = beam.algorithm_parameters.alpha;
+if (isfield(beam.a_params, "alpha"))
+	alpha = beam.a_params.alpha;
 end
-if (isfield(beam.algorithm_parameters, "max_shear"))
-	max_shear = beam.algorithm_parameters.max_shear;
+if (isfield(beam.a_params, "max_shear"))
+	max_shear = beam.a_params.max_shear;
 end
-if (isfield(beam.algorithm_parameters, "velocity_res"))
-	dv = beam.algorithm_parameters.velocity_res;
+if (isfield(beam.a_params, "velocity_res"))
+	dv = beam.a_params.velocity_res;
 end
 df = round(max_shear / dv); % wind shear bin offset
 w1 = cfg.cost_weights(1);
@@ -222,8 +222,8 @@ beam.M0 = M0;
 beam.M1 = M1;
 beam.M2 = M2;
 beam.denoised_spectra = mclms_denoised_spectra;
-beam.algorithm_parameters.mccf_cost_scores = cost_scores;
-beam.algorithm_parameters.mccf_ST_W = ST_W_array;
-beam.algorithm_parameters.peaks_idx = peaks_idx;
+beam.a_params.mccf_cost_scores = cost_scores;
+beam.a_params.mccf_ST_W = ST_W_array;
+beam.a_params.peaks_idx = peaks_idx;
 new_beam = beam;
 end

@@ -2,14 +2,14 @@ function new_beam = compute_candidate_peaks_beam(beam)
 % IME.COMPUTE_CANDIDATE_PEAKS_BEAM Adaptive Doppler-window peak selection for a RadarData beam.
 %
 %   Computes prospective candidate peaks for a beam and stores the cell array in
-%   beam.algorithm_parameters.ime_candidates_peaks.
+%   beam.a_params.ime_candidates_peaks.
 
 arguments (Input)
 	% Radar beam object containing spectra and noise parameters.
 	beam RadarData
 end
 arguments (Output)
-	% Modified RadarData beam populated with algorithm_parameters.ime_candidates_peaks.
+	% Modified RadarData beam populated with a_params.ime_candidates_peaks.
 	new_beam RadarData
 end
 
@@ -26,9 +26,9 @@ end
 vel_axis = utils.compute_velocity_bins(beam.nFFT, beam.ipp_us, beam.in_coh);
 candidate_peaks = ime.compute_candidate_peaks(spectra, noise_level, vel_axis);
 
-if ~isstruct(beam.algorithm_parameters)
-	beam.algorithm_parameters = struct();
+if ~isstruct(beam.a_params)
+	beam.a_params = struct();
 end
-beam.algorithm_parameters.ime_candidate_peaks = candidate_peaks;
+beam.a_params.ime_candidate_peaks = candidate_peaks;
 new_beam = beam;
 end

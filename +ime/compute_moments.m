@@ -6,7 +6,7 @@ arguments (Input)
 	beam RadarData
 end
 arguments (Output)
-	% Modified RadarData beam populated with M0, M1 (Hz), M2, SNR, noise_level, and algorithm_parameters.
+	% Modified RadarData beam populated with M0, M1 (Hz), M2, SNR, noise_level, and a_params.
 	new_beam RadarData
 end
 
@@ -18,7 +18,7 @@ M1 = NaN(1, num_bins);
 M2 = NaN(1, num_bins);
 SNR = -Inf(1, num_bins);
 
-profile = beam.algorithm_parameters.ime_profile;
+profile = beam.a_params.ime_profile;
 vel_factor = 299792458 / 205e6 / 2.0;
 
 for r = 1:num_bins

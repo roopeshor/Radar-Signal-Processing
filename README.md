@@ -194,7 +194,7 @@ S = compute_moments(out.south);
 E = compute_moments(out.east);
 ```
 
-For this to work, the beam should have required fields (M0, ref_M0, etc). If beam doesnt have it, then it can store it in `algorithm_parameters` parameter in the beam or if the parameter is something you think important, create new entry for it in [@RadarData/RadarData.m](@RadarData/RadarData.m)
+For this to work, the beam should have required fields (M0, ref_M0, etc). If beam doesnt have it, then it can store it in `a_params` parameter in the beam or if the parameter is something you think important, create new entry for it in [@RadarData/RadarData.m](@RadarData/RadarData.m)
 
 (MATLAB doesnt have "pass by reference" to modify beam itself, hence modified beam has to be returned).
 

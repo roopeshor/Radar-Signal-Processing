@@ -10,14 +10,14 @@ i1 = 1;
 i2 = obs.nRangeBins;
 vl = [-obs.v_max, obs.v_max]/3;
 vidx = round(rescale(vl, 1, 1024, InputMin=-obs.v_max, InputMax=obs.v_max));
-M = rescale(N.algorithm_parameters.peaks_idx, -obs.v_max, obs.v_max, InputMax=1024, InputMin=1);
+M = rescale(N.a_params.peaks_idx, -obs.v_max, obs.v_max, InputMax=1024, InputMin=1);
 
 heights = obs.heights(i1:i2)/1000;
 dspec = N.denoised_spectra(i1:i2, vidx(1):vidx(2));
 spec = N.spectra(i1:i2, vidx(1):vidx(2));
 compm = M(i1:i2);
 refm = N.ref_M1(i1:i2) * obs.DBS_Factor;
-stw = N.algorithm_parameters.mccf_ST_W(i1:i2, :);
+stw = N.a_params.mccf_ST_W(i1:i2, :);
 
 plt.plot_doppler_spectra(...
 	spectra    = 20*log10(abs(spec)), ...

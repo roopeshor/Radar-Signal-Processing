@@ -97,6 +97,6 @@ end
 beam.M0 = M0;
 beam.M1 = M1;
 beam.M2 = M2;
-beam.algorithm_parameters.mccf_cost_scores = cost_scores;
+beam.a_params.mccf_cost_scores = cost_scores;
 new_beam = beam;
 end

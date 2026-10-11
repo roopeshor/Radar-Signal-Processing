@@ -6,22 +6,22 @@ arguments (Input)
 	beam RadarData
 end
 arguments (Output)
-	% Modified RadarData beam populated with algorithm_parameters.profile, velocity, power, snr_db.
+	% Modified RadarData beam populated with a_params.profile, velocity, power, snr_db.
 	new_beam RadarData
 end
 
-if (isempty(beam.algorithm_parameters) ...
-	 || ~isfield(beam.algorithm_parameters, 'ime_candidate_peaks') ...
-	 || isempty(beam.algorithm_parameters.ime_candidate_peaks))
+if (isempty(beam.a_params) ...
+	 || ~isfield(beam.a_params, 'ime_candidate_peaks') ...
+	 || isempty(beam.a_params.ime_candidate_peaks))
 	beam = ime.compute_candidate_peaks_beam(beam);
 end
-candidates = beam.algorithm_parameters.ime_candidate_peaks;
+candidates = beam.a_params.ime_candidate_peaks;
 off_zenith = beam.m_fOffZenith;
 delta_R = 299792458 * beam.m_fBaudLength_us * 1e-6 / 2;
 
 profile = ime.trace_profile_from_candidates(candidates, off_zenith, delta_R);
 
-beam.algorithm_parameters.ime_profile = profile;
+beam.a_params.ime_profile = profile;
 num_bins = length(profile);
 vel_vec = NaN(1, num_bins);
 pow_vec = NaN(1, num_bins);
@@ -37,9 +37,9 @@ for r = 1:num_bins
 		snr_vec(r) = profile(r).snr_db;
 	end
 end
-beam.algorithm_parameters.ime_velocity = vel_vec;
-beam.algorithm_parameters.ime_power = pow_vec;
-beam.algorithm_parameters.ime_snr_db = snr_vec;
+beam.a_params.ime_velocity = vel_vec;
+beam.a_params.ime_power = pow_vec;
+beam.a_params.ime_snr_db = snr_vec;
 
 new_beam = beam;
 end
