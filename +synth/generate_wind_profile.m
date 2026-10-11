@@ -37,7 +37,7 @@ arguments
 	cfg.gw_nmodes double = 20        % [ ] Number of continuous gravity wave spectrum modes
 	cfg.gw_amp double = 2.5          % [m/s] Scaling factor for gravity wave horizontal velocity
 	cfg.gw_max_lambda double = 4.0;  % [km] Upper limit for gravity wave vertical scale
-	cfg.gw_damp_scale double = 12.0; % [km] Tightened damping scale (was 18.0 km) to control upper amplitude
+	cfg.gw_damp_scale double = 12.0; % [km] damping scale to control upper amplitude
 	cfg.gw_cf double = 0.05          % [ ] Coupling factor deriving vertical wave speed from horizontal wave speed
 	cfg.lw_Hs double = 7.0           % [km] Density scale height for wave amplification (e^(z / 2H_s))
 	cfg.lw_N_bv double = 0.012;      % [rad/s] Brunt-Väisälä buoyancy frequency

@@ -36,11 +36,11 @@ end
 imagesc(x_bounds, y_bounds, cfg.spectra);
 hold on;
 if ~isempty(cfg.comp_m)
-	plot(cfg.comp_m, cfg.heights, '-', 'LineWidth', 1, 'Color', cfg.comp_m_color);
-	legnds = [legnds, "comp"];
+	plot(cfg.comp_m, cfg.heights, '-', 'LineWidth', 2, 'Color', cfg.comp_m_color);
+	legnds = [legnds, "computed"];
 end
 if ~isempty(cfg.ref_m)
-	plot(cfg.ref_m, cfg.heights, '-', 'LineWidth', 1, 'Color', cfg.ref_m_color);
+	plot(cfg.ref_m, cfg.heights, '-', 'LineWidth', 2, 'Color', cfg.ref_m_color);
 	legnds = [legnds, "ref"];
 end
 xlim(x_bounds);

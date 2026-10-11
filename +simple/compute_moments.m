@@ -54,7 +54,7 @@ for i = 1:height_bins
 	M2(i) = sum(((freq - M1(i)) .^ 2) .* signal_block) / M0(i);
 	SNR(i) = sum(((freq - M1(i)) .^ 3) .* signal_block) / M0(i);
 end
-
+disp(M1)
 beam.M0 = M0;
 beam.M1 = M1;
 beam.M2 = M2;

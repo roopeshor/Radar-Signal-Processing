@@ -47,7 +47,7 @@ M1 = zeros(1, height_bins);
 M2 = zeros(1, height_bins);
 cost_scores = zeros(height_bins, nfft);
 mclms_denoised_spectra = zeros(height_bins, nfft);
-peak_idx = zeros(height_bins);
+peaks_idx = zeros(height_bins, 1);
 
 F0 = []; % spectral peak of previous range bin[cite: 4]
 
@@ -148,8 +148,8 @@ for r = 1:height_bins
 	if r == 1
 		% initial peak selection
 		avg_conv = mean(V_conv, 1);
-		avg_spec = abs(fftshift(fft(avg_conv, nfft))).^2;
-		[~, selected_peak_idx] = max(avg_spec);
+		final_spectr = abs(fftshift(fft(avg_conv, nfft))).^2;
+		[~, selected_peak_idx] = max(final_spectr);
 	else
 		ST_W_spec = spec_mclms(ST_W);
 		M_rmax = max(ST_W_spec);
@@ -195,7 +195,7 @@ for r = 1:height_bins
 	end
 
 	F0 = selected_peak_idx;
-	peak_idx(r) = selected_peak_idx;
+	peaks_idx(r) = selected_peak_idx;
 
 	% -----------------------------------------------------------------
 	% moment Estimation (M0, M1, M2)
@@ -224,5 +224,6 @@ beam.M2 = M2;
 beam.denoised_spectra = mclms_denoised_spectra;
 beam.algorithm_parameters.mccf_cost_scores = cost_scores;
 beam.algorithm_parameters.mccf_ST_W = ST_W_array;
+beam.algorithm_parameters.peaks_idx = peaks_idx;
 new_beam = beam;
 end

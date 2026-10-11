@@ -2,7 +2,8 @@ filepath = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_19_22_59");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
-obs = obs.compute_spectra_with(@mccf.compute_spectra);
+obs = obs.compute_spectra_with(@ime.compute_spectra);
+obs = obs.apply_fx(@ime.denoise_beam);
 obs = obs.apply_fx(@ime.compute_moments);
 
 N = obs.north;

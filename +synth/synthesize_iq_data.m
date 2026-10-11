@@ -17,8 +17,12 @@ arguments (Input)
 	cfg.add_iq_noise logical = true
 	% additional dc offset. this fraction of peak value of spectrum is added to signal in time domain
 	cfg.dc_rel_power double = 0
+	% ground clutter power. this fraction of peak value of spectrum is added to signal in time domain
+	cfg.gc_rel_power double = 0.005
 	% width of DC component across range bins.
 	cfg.sigma_dc (1, :) double = []
+	% width of ground clutter across range bins.
+	cfg.sigma_gc (1, :) double = []
 	% list of height bin and bright band widths
 	cfg.bright_bands (:, 2) double = []
 end
@@ -38,18 +42,20 @@ DBS_V = wavelen/2;
 fd      = -cfg.vr / DBS_V;
 PRF_eff = 1 / (ipp_us * 1e-6 * cohIn);
 sigma_f = 2 * cfg.spec_w / wavelen;
-
 if isempty(cfg.SNR)
 	cfg.SNR = 10 .^ (linspace(40, -40, nRangeBins)' / 10);
 end
 
 if isempty(cfg.sigma_dc)
-	cfg.sigma_dc = (randn(1, nRangeBins)  + 1) / 12;
+	cfg.sigma_dc = ones(1, nRangeBins) / 20;
+end
+if isempty(cfg.sigma_gc)
+	cfg.sigma_gc = 1./((1:nRangeBins) / 10) / 5;
 end
 f = linspace(-PRF_eff/2, PRF_eff/2 - PRF_eff/NFFT, NFFT);
 BeamData = zeros(nRangeBins, NFFT, 1);
 
-bright_band_ranges = cfg.bright_bands(:, 1);
+bright_band_ranges = round(cfg.bright_bands(:, 1));
 i = 1;
 for z = 1:nRangeBins
 	P_sig = P_noise * cfg.SNR(z);
@@ -66,13 +72,18 @@ for z = 1:nRangeBins
 	S = S_sig + S_noise;
 
 	% add DC
-	S_dc = (cfg.dc_rel_power * (exp(z / nRangeBins) - .7)) * sum(S) * exp(-f.^2 / (2 * cfg.sigma_dc(z)^2));
+	S_dc = cfg.dc_rel_power * sum(S) * exp(-f.^2 / (2 * cfg.sigma_dc(z)^2));
 	S = S + S_dc;
+
+	% add ground clutter
+	S_gc = cfg.gc_rel_power * sum(S) * exp(-f.^2 / (2 * cfg.sigma_gc(z)^2));
+	S = S + S_gc;
 
 	if (i <= length(bright_band_ranges) && bright_band_ranges(i) == z)
 		% add bright band (adding after DC, because im anticipating some dc explosion)
 		% 30-40dB range
-		S_bb = sum(S) * 10 ^ (-40/10) * (rand()/3 + 1) * exp(-f.^2 / (2 * cfg.bright_bands(i, 2)^2));
+		ampl = sum(S)* 10 ^ ((rescale(i, -3.5, 2, InputMin=1, InputMax=nRangeBins)));
+		S_bb = ampl * exp(-f.^2 / (2 * cfg.bright_bands(i, 2)^2));
 		S = S + S_bb;
 		i = i+1;
 	end

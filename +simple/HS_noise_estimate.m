@@ -17,7 +17,7 @@ end
 M = beam.m_sNumOfInCohIntegrations;
 [height_bins, N] = size(beam.spectra);
 
-A = sort(beam.spectra, 2);
+A = sort(abs(beam.spectra).^2, 2);
 
 n_arr = (0:(N-1)) + N;
 nm = repmat(n_arr, height_bins, 1);
