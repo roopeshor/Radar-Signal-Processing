@@ -2,9 +2,10 @@ filepath = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_19_22_59");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
-obs = obs.compute_spectra_with(@ime.compute_spectra);
-obs = obs.apply_fx(@ime.denoise_beam);
-obs = obs.apply_fx(@ime.compute_moments);
+obs = obs.compute_spectra_with(@mccf.compute_spectra);
+obs = obs.apply_beam_fx(@ime.denoise_beam);
+obs = obs.apply_beam_fx(@ime.estimate_params, vel_axis=obs.velocities);
+obs = utils.compute_uvw(obs);
 
 N = obs.north;
 S = obs.south;
@@ -17,14 +18,15 @@ figure("Name", "Spectra");
 
 dirs = [N,S,E,W,V];
 
-tiledlayout(1, 1);
-for i = 1:1
+tiledlayout(1, 5);
+for i = 1:5
 	d = dirs(i);
 	nexttile;
 	plt.plot_doppler_spectra(...
 		spectra   = 10*log10(abs(d.denoised_spectra).^2),                   ...
 		direction = d.direction,                           ...
 		comp_m    = -d.M1 * obs.DBS_Factor,               ...
+		ref_m    = -d.ref_M1 * obs.DBS_Factor,               ...
 		heights   = obs.heights,                           ...
 		x_max     = obs.v_max                    ...
 		)

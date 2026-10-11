@@ -1,4 +1,4 @@
-function moments = ime_calculate_moments(P, vel_axis, noise_level)
+function moments = calculate_moments(P, vel_axis, noise_level)
 % Calculates true Doppler spectral moments for a given peak.
 
     % Noise subtraction and bounding

@@ -2,7 +2,7 @@ filepath = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_16_16_17");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
-obs = obs.apply_fx(@mccf.compute_all_params, win_coeff=1.5);
+obs = obs.apply_beam_fx(@mccf.compute_all_params, win_coeff=1.5);
 N = obs.north;
 
 figure("Name", "ST Window");

@@ -209,18 +209,10 @@ for r = 1:height_bins
 		maxI = maxI + 1;
 	end
 
-	signal_block = spec_mclms(minI:maxI);
-	indices = (minI:maxI) - 1;
-
-	M0(r) = sum(signal_block);
-	freq = (indices - (nfft / 2)) / (beam.ipp_us * beam.n_coh * nfft * 1e-6);
-	M1(r) = sum(signal_block .* freq) / M0(r);
-	M2(r) = sum(((freq - M1(r)).^2) .* signal_block) / M0(r);
 end
 
-beam.M0 = M0;
-beam.M1 = M1;
-beam.M2 = M2;
+fmax = (nfft/2) / (nfft * beam.ipp_us * 1e-6 * beam.n_coh);
+beam.M1 = rescale(peaks_idx, -fmax, fmax, InputMax=1024, InputMin=1);
 beam.denoised_spectra = mclms_denoised_spectra;
 beam.a_params.mccf_cost_scores = cost_scores;
 beam.a_params.mccf_ST_W = ST_W_array;

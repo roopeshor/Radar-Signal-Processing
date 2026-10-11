@@ -1,4 +1,4 @@
-function spectra = ime_compute_spectra(beam)
+function spectra = compute_spectra(beam)
 % Takes raw complex IQ data and generates the averaged Doppler power spectrum.
 arguments (Input)
 	beam RadarData
