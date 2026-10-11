@@ -94,7 +94,7 @@ obs = obs.apply_fx(@ime.compute_moments);
 
 % Example: MCCF Method (+mccf)
 obs = obs.compute_spectra_with(@mccf.compute_spectra);
-obs = obs.apply_fx(@simple.HS_denoise_beam);
+obs = obs.apply_fx(@simple.denoise_beam);
 obs = obs.apply_fx(@mccf.compute_moments);
 ```
 

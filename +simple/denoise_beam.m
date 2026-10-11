@@ -1,4 +1,4 @@
-function beam = HS_denoise_beam(beam)
+function beam = denoise_beam(beam)
 % Denoises a single RadarData beam by subtracting Hildebrand-Sekhon noise.
 
 arguments (Input)
