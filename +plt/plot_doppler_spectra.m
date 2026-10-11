@@ -20,6 +20,8 @@ arguments (Input)
 	cfg.comp_m_color = "black"
 	% Line color for reference moments curve.
 	cfg.ref_m_color = "red"
+	% LineWidth of plots
+	cfg.plot_thickness = 1
 	% X-axis domain mode ("velocity" or "freq").
 	cfg.x_axis_type string = "velocity"
 end
@@ -36,11 +38,11 @@ end
 imagesc(x_bounds, y_bounds, cfg.spectra);
 hold on;
 if ~isempty(cfg.comp_m)
-	plot(cfg.comp_m, cfg.heights, '-', 'LineWidth', 2, 'Color', cfg.comp_m_color);
+	plot(cfg.comp_m, cfg.heights, '-', LineWidth=cfg.plot_thickness, Color=cfg.comp_m_color);
 	legnds = [legnds, "computed"];
 end
 if ~isempty(cfg.ref_m)
-	plot(cfg.ref_m, cfg.heights, '-', 'LineWidth', 2, 'Color', cfg.ref_m_color);
+	plot(cfg.ref_m, cfg.heights, '-', LineWidth=cfg.plot_thickness, Color=cfg.ref_m_color);
 	legnds = [legnds, "ref"];
 end
 xlim(x_bounds);

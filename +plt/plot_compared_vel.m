@@ -17,12 +17,12 @@ arguments (Input)
 end
 
 subplot(1, cfg.subplots, cfg.plotidx)
-plot(cfg.ref, cfg.heights); hold on
-plot(cfg.calc, cfg.heights);
+plot(cfg.ref, cfg.heights, DisplayName="ref"); hold on
+plot(cfg.calc, cfg.heights, DisplayName="calc");
 xlim([min(cfg.ref) * 2, max(cfg.ref) * 2]);
 ylim([min(cfg.heights), max(cfg.heights)]);
 xlabel("wind velocity (m/s)")
 ylabel("height (km)")
 title(cfg.title);
-legend(["ref", "calc"]);
+legend();
 end
