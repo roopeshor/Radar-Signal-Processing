@@ -23,7 +23,7 @@ arguments (Output)
 end
 
 obs = obs.compute_spectra_with(@ime.compute_spectra);
-obs = obs.compute_moments_with(@ime.compute_moments);
+obs = obs.apply_fx(@ime.compute_moments);
 
 N = obs.north;
 S = obs.south;
@@ -49,7 +49,7 @@ w = V_V;
 V_radial = [V_V; V_N; V_E; V_S; V_W];
 spectra_all = {V.spectra; N.spectra; E.spectra; S.spectra; W.spectra};
 
-vel_axis = utils.compute_velocity_bins(N);
+vel_axis = utils.compute_velocity_bins(N.nFFT, N.ipp_us, N.in_coh);
 delta_R = 299792458 * N.m_fBaudLength_us * 1e-6 / 2;
 altitudes = (0:(numRangeBins-1)) * delta_R;
 end

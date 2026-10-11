@@ -3,7 +3,7 @@ function plot_doppler_spectra(cfg)
 
 arguments (Input)
 	% Power spectra matrix (RangeBins x NFFT).
-	cfg.spectra (:, 1024) double
+	cfg.spectra (:, :) double
 	% Computed Doppler moments profile vector.
 	cfg.comp_m (1, :) double = []
 	% Reference Doppler moments profile vector.

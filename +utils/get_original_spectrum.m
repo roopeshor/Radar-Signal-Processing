@@ -9,7 +9,7 @@ arguments (Output)
 	spectra (:, 1024) double
 end
 spectraCube = fft(beam.BeamData, [], 2);
-spectraCube = abs(fftshift(spectraCube, 2)) .^ 2;
+spectraCube = fftshift(spectraCube, 2);
 
 % Incoherent integration and normalization
 spectraCube = mean(spectraCube, 3);

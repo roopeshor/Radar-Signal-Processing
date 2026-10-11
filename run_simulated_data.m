@@ -35,7 +35,7 @@ obs = synth.create_synthetic_observation(...
 	);
 obs = obs.compute_spectra_with(@simple.compute_spectra);
 obs = simple.HS_denoise_all_beams(obs);
-obs = obs.compute_moments_with(@simple.compute_moments);
+obs = obs.apply_fx(@simple.compute_moments);
 
 figure("Name", "Spectra");
 tiledlayout(1,1)
@@ -72,7 +72,7 @@ for i = 1:1
 end
 % colorbar;
 % %% UVW Wind Vector Plotting
-return;
+
 figure("Name", "UVW")
 
 N = obs.north;

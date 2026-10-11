@@ -17,7 +17,7 @@ obs = Observation(fn);
 obs = obs.compute_spectra_with(@ime.compute_spectra);
 obs = ime.remove_dc_from_beams(obs);
 obs = ime.denoise_all_beams(obs);
-obs = obs.compute_moments_with(@ime.compute_moments);
+obs = obs.apply_fx(@ime.compute_moments);
 
 N = obs.north;
 S = obs.south;
