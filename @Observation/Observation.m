@@ -21,6 +21,11 @@ classdef Observation
 		ref_V (1, :) double
 		ref_W (1, :) double
 
+		% computed props
+		U (1, :) double
+		V (1, :) double
+		W (1, :) double
+
 		heights (1, :) double % computed heights from @utils.compute_height_bins
 		velocities (1, :) double % computed velocities from @utils.compute_velocity_bins
 
@@ -37,7 +42,8 @@ classdef Observation
 		end_height (1, 1) double % end height from one of the beams
 		nRangeBins (1, 1) double % number of range bins
 		ipp_us (1, 1) double % Intr Pulse Period in microseconds
-		in_coh (1, 1) double % ncoherent integrations
+		in_coh (1, 1) double % Incoherent integrations
+		n_coh (1, 1) double % coherent integrations
 		nFFT (1, 1) double % number of FFT bins
 	end
 
@@ -104,11 +110,12 @@ classdef Observation
 			obs.nFFT = obs.north.nFFT;
 			obs.ipp_us = obs.north.ipp_us;
 			obs.in_coh = obs.north.in_coh;
+			obs.n_coh = obs.north.n_coh;
 			obs.heights = utils.compute_height_bins(...
 				obs.start_height, ...
 				obs.end_height, ...
 				obs.nRangeBins);
-			obs.velocities = utils.compute_velocity_bins(obs.nFFT, obs.ipp_us, obs.in_coh);
+			obs.velocities = utils.compute_velocity_bins(obs.nFFT, obs.ipp_us, obs.n_coh);
 			for dir = Data.directions
 				obs.(dir).spectra = utils.get_original_spectrum(obs.(dir));
 			end
