@@ -7,18 +7,9 @@ arguments (Output)
 	spectra (:, 1024) double
 end
 raw_iq = beam.BeamData;
-[num_bins, nfft, num_incoh] = size(raw_iq);
-spectra_raw = zeros(num_bins, nfft);
-
-win = hanning(nfft);
-for r = 1:num_bins
-	for i = 1:num_incoh
-		iq = squeeze(raw_iq(r, :, i));
-		windowed_iq = iq(:) .* win;
-		S = fftshift(fft(windowed_iq));
-		power_S = abs(S).^2;
-		spectra_raw(r, :) = spectra_raw(r, :) + power_S';
-	end
-end
-spectra = spectra_raw / num_incoh;
+[~, nfft, num_incoh] = size(raw_iq);
+win = reshape(hanning(nfft), 1, nfft, 1);
+windowed_iq = raw_iq .* win;
+S = fftshift(fft(windowed_iq, [], 2), 2);
+spectra = mean(abs(S).^2, 3) / num_incoh;
 end

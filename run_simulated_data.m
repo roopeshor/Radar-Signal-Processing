@@ -1,6 +1,6 @@
 % Synthesizes raw ST Radar data from a prescribed wind profile
 % and then runs the standard spectrum and moments processing pipeline.
-for exp_idx=16:17
+for exp_idx=18:18
 	disp("============== Exp: " + exp_idx + " ==============")
 
 	alts = ["lower", "middle", "upper"];

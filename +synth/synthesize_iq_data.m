@@ -1,9 +1,9 @@
-function BeamData = synthesize_iq_data(cfg)
+function BeamData = synthesize_iq_data_vectrzd(cfg)
 % Synthesizes complex IQ time-series data using Zrnic spectral simulation.
 %
 %   Generates Gaussian power spectrum signatures modeled on Doppler velocity, spectral width, and SNR,
 %   applies complex Gaussian noise shaping (Zrnic method), and computes inverse FFT to yield IQ time series.
-
+% Vectorized function
 arguments (Input)
 	% Radial velocity profile vector (m/s).
 	cfg.vr (1, :) double
@@ -52,54 +52,56 @@ end
 if isempty(cfg.sigma_gc)
 	cfg.sigma_gc = 1./((1:nRangeBins) / 10) / 5;
 end
+
 f = linspace(-PRF_eff/2, PRF_eff/2 - PRF_eff/NFFT, NFFT);
-BeamData = zeros(nRangeBins, NFFT, 1);
-
 bright_band_ranges = round(cfg.bright_bands(:, 1));
-i = 1;
-for z = 1:nRangeBins
-	P_sig = P_noise * cfg.SNR(z);
-	S_sig = exp(-(f - fd(z)).^2 / (2 * sigma_f(z)^2));
 
-	if sum(S_sig) > 0
-		S_sig = S_sig / sum(S_sig) * P_sig / (sqrt(2 * pi) * sigma_f(z));
-	else
-		S_sig = zeros(1, NFFT);
+% column orientation for range-bin parameters
+fd_col       = fd(:);
+sigma_f_col  = sigma_f(:);
+SNR_col      = cfg.SNR(:);
+sigma_dc_col = cfg.sigma_dc(:);
+sigma_gc_col = cfg.sigma_gc(:);
+f_row        = reshape(f, 1, NFFT);
+
+P_sig     = P_noise * SNR_col;
+S_sig     = exp(-(f_row - fd_col).^2 ./ (2 * sigma_f_col.^2));
+sum_S_sig = sum(S_sig, 2);
+
+scale = zeros(nRangeBins, 1);
+valid = sum_S_sig > 0;
+scale(valid) = (P_sig(valid) ./ sum_S_sig(valid)) ./ (sqrt(2 * pi) * sigma_f_col(valid));
+S_sig = S_sig .* scale;
+
+S = S_sig + (P_noise / NFFT);
+
+% DC Component
+sum_S = sum(S, 2);
+S = S + (cfg.dc_rel_power * sum_S) .* exp(-f_row.^2 ./ (2 * sigma_dc_col.^2));
+
+% Ground Clutter
+sum_S = sum(S, 2);
+S = S + (cfg.gc_rel_power * sum_S) .* exp(-f_row.^2 ./ (2 * sigma_gc_col.^2));
+
+% Bright Bands
+num_bb = size(cfg.bright_bands, 1);
+for k = 1:num_bb
+	z_idx = bright_band_ranges(k);
+	if z_idx >= 1 && z_idx <= nRangeBins
+		ampl = sum(S(z_idx, :)) * 10 ^ rescale(k, -3.5, 2, 'InputMin', 1, 'InputMax', nRangeBins);
+		S(z_idx, :) = S(z_idx, :) + ampl * exp(-f_row.^2 / (2 * cfg.bright_bands(k, 2)^2));
 	end
-
-	% add Noise
-	S_noise = (P_noise / NFFT) * ones(1, NFFT);
-	S = S_sig + S_noise;
-
-	% add DC
-	S_dc = cfg.dc_rel_power * sum(S) * exp(-f.^2 / (2 * cfg.sigma_dc(z)^2));
-	S = S + S_dc;
-
-	% add ground clutter
-	S_gc = cfg.gc_rel_power * sum(S) * exp(-f.^2 / (2 * cfg.sigma_gc(z)^2));
-	S = S + S_gc;
-
-	if (i <= length(bright_band_ranges) && bright_band_ranges(i) == z)
-		% add bright band (adding after DC, because im anticipating some dc explosion)
-		% 30-40dB range
-		ampl = sum(S)* 10 ^ ((rescale(i, -3.5, 2, InputMin=1, InputMax=nRangeBins)));
-		S_bb = ampl * exp(-f.^2 / (2 * cfg.bright_bands(i, 2)^2));
-		S = S + S_bb;
-		i = i+1;
-	end
-
-
-	if cfg.add_iq_noise
-		X = randn(1, NFFT);
-		Y = randn(1, NFFT);
-		Z = sqrt(S/2) .* (X + 1i * Y);
-	else
-		Z = sqrt(S/2);
-	end
-
-	% Inverse FFT from centered Doppler spectrum Z to time series s
-	s = ifft(ifftshift(Z)) * sqrt(NFFT);
-	BeamData(z, :, 1) = s;
 end
-BeamData = round(BeamData);
+
+S_sqrt = sqrt(S / 2);
+if cfg.add_iq_noise
+	X = randn(nRangeBins, NFFT);
+	Y = randn(nRangeBins, NFFT);
+	Z = S_sqrt .* (X + 1i * Y);
+else
+	Z = S_sqrt;
+end
+
+BeamData = round(ifft(ifftshift(Z, 2), [], 2) * sqrt(NFFT));
+
 end
