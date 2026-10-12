@@ -1,4 +1,12 @@
-function Y_r = mclms_filter(X_r, X_r_prime, mclms_len)
+function Y_r = mclms_filter(X_r, X_r_prime, mclms_len) %#codegen
+arguments (Input)
+	X_r (1, :) double
+	X_r_prime (1, :) double
+	mclms_len (1, 1) double
+end
+arguments (Output)
+	Y_r (1, :) double
+end
 N2 = length(X_r);
 % Normalized step size u
 u = 1 / sum(abs(X_r).^2);
@@ -17,15 +25,17 @@ for j = 1:N2
 	W = 0.98 * W + u * e_j * conj(X_vec);          % Weight update
 end
 
-% Pass 2: Re-filtering with updated weights W2 = W1'
-W2 = W;
-Y_r = zeros(1, N2);
-for j = 1:N2
-	if j < mclms_len
-		X_vec = [zeros(1, mclms_len - j), X_r(1:j)];
-	else
-		X_vec = X_r(j - mclms_len + 1 : j);
-	end
-	Y_r(j) = W2 * X_vec.';
-end
+% Pass 2: Re-filtering with updated weights W
+% Y_r = zeros(1, N2);
+% for j = 1:N2
+% 	if j < mclms_len
+% 		X_vec = [zeros(1, mclms_len - j), X_r(1:j)];
+% 	else
+% 		X_vec = X_r(j - mclms_len + 1 : j);
+% 	end
+% 	Y_r(j) = W * X_vec.';
+% end
+
+% 0.6ms/60% faster than above
+Y_r = filter(fliplr(W), 1, X_r);
 end
