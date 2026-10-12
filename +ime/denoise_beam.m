@@ -32,7 +32,7 @@ Praw = movmean(Praw, 5, 2);
 % Noise Estimation using HS
 M = beam.m_sNumOfInCohIntegrations;
 noise_level = ime.HS_noise_estimate(Praw, M);
-Pclean = Praw - noise_level;
+Pclean = Praw - noise_level';
 Pclean(Pclean < 0) = 0;
 
 beam.denoised_spectra = Pclean;

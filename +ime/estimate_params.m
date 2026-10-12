@@ -6,6 +6,9 @@ end
 arguments (Output)
 	beam RadarData
 end
+if isempty(beam.noise_level)
+	beam.noise_level = ime.HS_noise_estimate(beam.spectra, beam.in_coh);
+end
 candidates = ime.get_candidate_peaks(beam.denoised_spectra, beam.noise_level, cfg.vel_axis);
 delta_R = 3.0e8 * beam.m_fBaudLength_us * 1e-6 / 2;
 profile = ime.trace_profile(candidates, beam.m_fOffZenith, delta_R);

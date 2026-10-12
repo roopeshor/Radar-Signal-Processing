@@ -46,7 +46,7 @@ end
 xlim(x_bounds);
 hold off;
 
-set(gca, 'YDir', 'normal');
+set(gca, YDir="normal");
 colormap('Parula');
 
 xlabel("Doppler " + cfg.x_axis_type + " (m/s)");

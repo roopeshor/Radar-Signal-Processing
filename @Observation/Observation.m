@@ -129,12 +129,5 @@ classdef Observation
 			end
 		end
 
-		function obs = compute_spectra_with(obs, fx, varargin)
-			% Batch applies a spectrum computating function across all beams in an Observation.
-			for dir = Data.directions
-				obs.(dir).denoised_spectra = fx(obs.(dir), varargin{:});
-			end
-		end
-
 	end
 end

@@ -1,5 +1,5 @@
-function spectra = compute_spectra(beam)
-% ST.COMPUTE_SPECTRA Computes power spectra using pre-FFT coherent time-domain accumulation.
+function spectra = compute_beam_spectra(beam)
+% ST.compute_beam_spectra Computes power spectra using pre-FFT coherent time-domain accumulation.
 %
 %   Applies a Hanning window to IQ complex time series, coherently sums complex IQ signals across
 %   all incoherent integrations in the time domain before FFT, and computes fftshift magnitude-squared

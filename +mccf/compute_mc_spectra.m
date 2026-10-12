@@ -1,5 +1,5 @@
 function spectra = compute_mc_spectra(beam, cfg)
-% MCCF.COMPUTE_SPECTRA Computes power spectra using Mutual convolution.
+% MCCF.compute_beam_spectra Computes power spectra using Mutual convolution.
 %
 %   Processes complex IQ time series by applying frequency-domain DC clutter masking,
 %   segmenting the signal into overlapping windows, and computing cross-correlations

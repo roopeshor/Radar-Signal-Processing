@@ -1,6 +1,6 @@
 % Synthesizes raw ST Radar data from a prescribed wind profile
 % and then runs the standard spectrum and moments processing pipeline.
-for exp_idx=18:18
+for exp_idx=19:19
 	disp("============== Exp: " + exp_idx + " ==============")
 
 	alts = ["lower", "middle", "upper"];
@@ -86,7 +86,7 @@ for exp_idx=18:18
 
 	disp("    computing ime")
 	obs_ime = obs_base;
-	obs_ime = obs_ime.compute_spectra_with(@ime.compute_spectra);
+	obs_ime = obs_ime.apply_beam_fx(@ime.compute_beam_spectra);
 	obs_ime = obs_ime.apply_beam_fx(@ime.denoise_beam);
 	obs_ime = obs_ime.apply_beam_fx(@ime.estimate_params, vel_axis=obs_ime.velocities);
 	plt_res(obs_ime, "ime", exp_idx, params);
@@ -94,7 +94,7 @@ for exp_idx=18:18
 
 	disp("    computing simple")
 	obs_simp = obs_base;
-	obs_simp = obs_simp.compute_spectra_with(@simple.compute_spectra);
+	obs_simp = obs_simp.apply_beam_fx(@simple.compute_beam_spectra);
 	obs_simp = obs_simp.apply_beam_fx(@simple.denoise_beam);
 	obs_simp = obs_simp.apply_beam_fx(@simple.compute_moments);
 	plt_res(obs_simp, "simple", exp_idx, params);
@@ -102,7 +102,7 @@ for exp_idx=18:18
 
 	disp("    computing hybrid")
 	obs_hyb = obs_base;
-	obs_hyb = obs_hyb.compute_spectra_with(@mccf.compute_spectra);
+	obs_hyb = obs_hyb.apply_beam_fx(@mccf.compute_beam_spectra);
 	obs_hyb = obs_hyb.apply_beam_fx(@ime.denoise_beam);
 	obs_hyb = obs_hyb.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb.velocities);
 	plt_res(obs_hyb, "hybrid", exp_idx, params);

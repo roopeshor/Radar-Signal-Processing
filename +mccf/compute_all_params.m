@@ -42,9 +42,6 @@ w1 = cfg.cost_weights(1);
 w2 = cfg.cost_weights(2);
 mclms_len = 10;                     % mCLMS filter length
 
-M0 = zeros(1, height_bins);
-M1 = zeros(1, height_bins);
-M2 = zeros(1, height_bins);
 cost_scores = zeros(height_bins, nfft);
 mclms_denoised_spectra = zeros(height_bins, nfft);
 peaks_idx = zeros(height_bins, 1);

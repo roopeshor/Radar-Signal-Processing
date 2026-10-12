@@ -83,17 +83,18 @@ obs = Observation(filepath);
 
 ### Processing Pipeline via Hot-Swappable Endpoints
 
-Methods (`+ime`, `@mccf`, `@st`, `@simple`) export standardized function handles for `compute_spectra` and `compute_moments`:
+Methods (`+ime`, `@mccf`, `@st`, `@simple`) export standardized function handles for `compute_beam_spectra` and `compute_moments`:
 
 ```matlab
 % Example: IME Method (+ime)
-obs = obs.compute_spectra_with(@ime.compute_spectra);
-obs = ime.remove_dc_from_beams(obs);
-obs = ime.denoise_all_beams(obs);
+obs = obs.apply_beam_fx(@ime.compute_beam_spectra);
+obs = obs.apply_beam_fx(@ime.denoise_beam);
+obs = obs.apply_beam_fx(@ime.estimate_params, vel_axis=obs.velocities);
 obs = obs.apply_beam_fx(@ime.compute_moments);
+obs = utils.compute_uvw(obs);
 
 % Example: MCCF Method (+mccf)
-obs = obs.compute_spectra_with(@mccf.compute_spectra);
+obs = obs.apply_beam_fx(@mccf.compute_beam_spectra);
 obs = obs.apply_beam_fx(@simple.denoise_beam);
 obs = obs.apply_beam_fx(@mccf.compute_moments);
 ```
@@ -101,7 +102,7 @@ obs = obs.apply_beam_fx(@mccf.compute_moments);
 ### Extracting Wind Profiles (DBS Equations)
 
 To retrieve zonal ($U$), meridional ($V$), and vertical ($W$) wind velocity profiles from the 5 beam moments:
-
+. Use `utils.compute_uvw` for this
 ```matlab
 N = obs.north; S = obs.south; E = obs.east; W = obs.west; V = obs.vertical;
 
@@ -125,7 +126,8 @@ And sometimes algorithms from unrelated methods might produce best results. So f
 
 ### Input to function
 If it depends on some part of the observation, a beam as a whole _should_ be given to the function.
-And if the function expects some other part of the observation or some custom parameters (say DBS factors, windowing functions, etc), it _should_ be passed as a optional argument. So a function signature should look like this:
+And if the function expects some other part of the observation or some custom parameters (say DBS factors, windowing functions, etc), it _should_ be passed as a optional argument.
+So a function signature should look like this:
 
 ```matlab
 function out = some_param_calculator(beam, options)
@@ -142,33 +144,15 @@ end
 
 out = some_param_calculator(out.north, window=@hann, size=3)
 ```
-
 Also optional arguments should have some default value.
 
-_Always_ add `arguments` block to every function to specify the datatype of the inputs and output. This prevents lot of bugs and also gives useful intelllisense/suggestions in code editor.
+_Always_ add `arguments` block to every function to specify the datatype of the inputs and output.
+This prevents lot of bugs and also gives useful intelllisense/suggestions in code editor.
 
 ### Output from function
-If a function produces 1 output (a spectra, or denoised spectra) it can be returned as such:
 
-```matlab
-
-function spectra = compute_spectra(beam)
-	arguments (Input)
-		beam RadarData
-	end
-	arguments (Output)
-        spectra (:, 1024) double
-    end
-	% do something with beam
-	% ....
-
-	spectra = some_result
-end
-
-out.spectra = compute_spectra(out.north);
-```
-Or if it modifies a beam, the output can be directly added to beam itself.
-If a function produces 2 or more outputs (Moments, or some other things), The function _should_ copy given beam, add those things to it and return the new beam.
+If the output is a required property, it should modify the beam by adding it to `a_params` of beam.
+If a function some intermediate properties, and is directly and only used by other user facing functions it can return it as such.
 This is to make the syntax more concise. Instead if all 3 moments were returned as an array, then calling the function would become verbose:
 ```matlab
 function [M0, M1, M2] = compute_moments(beam)
@@ -184,6 +168,7 @@ This can be avoided if the outputs are packaged into the beam itself:
 
 function new_beam = compute_moments(beam)
 	new_beam = beam;
+	...
 	new_beam.M0 = M0;
 	new_beam.M1 = M1;
 	new_beam.M2 = M2;
@@ -194,7 +179,9 @@ S = compute_moments(out.south);
 E = compute_moments(out.east);
 ```
 
-For this to work, the beam should have required fields (M0, ref_M0, etc). If beam doesnt have it, then it can store it in `a_params` parameter in the beam or if the parameter is something you think important, create new entry for it in [@RadarData/RadarData.m](@RadarData/RadarData.m)
+For this to work, the beam should have required fields (M0, ref_M0, etc).
+If beam doesnt have it, then it can store it in `a_params` parameter in the beam or
+if the parameter is something you think important, create new entry for it in [@RadarData/RadarData.m](@RadarData/RadarData.m)
 
 (MATLAB doesnt have "pass by reference" to modify beam itself, hence modified beam has to be returned).
 

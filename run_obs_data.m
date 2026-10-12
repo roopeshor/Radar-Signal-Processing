@@ -2,8 +2,7 @@ filepath = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_19_22_59");
 disp("Processing file: " + filepath);
 
 obs = Observation(filepath);
-obs = obs.compute_spectra_with(@mccf.compute_spectra);
-obs = obs.apply_beam_fx(@ime.denoise_beam);
+obs = obs.apply_beam_fx(@mccf.compute_beam_spectra);
 obs = obs.apply_beam_fx(@ime.estimate_params, vel_axis=obs.velocities);
 obs = utils.compute_uvw(obs);
 
@@ -13,7 +12,6 @@ E = obs.east;
 W = obs.west;
 V = obs.vertical;
 
-%% Doppler Spectra and Moments
 figure("Name", "Spectra");
 
 dirs = [N,S,E,W,V];

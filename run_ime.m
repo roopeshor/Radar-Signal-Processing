@@ -1,7 +1,7 @@
 clear; clc; close all;
 fn = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_19_17_20");
 obs = Observation(fn);
-obs = obs.compute_spectra_with(@ime.compute_spectra);
+obs = obs.apply_beam_fx(@ime.compute_beam_spectra);
 obs = obs.apply_beam_fx(@ime.denoise_beam);
 obs = obs.apply_beam_fx(@ime.estimate_params, vel_axis=obs.velocities);
 obs = utils.compute_uvw(obs);
