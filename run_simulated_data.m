@@ -4,11 +4,16 @@
 params_file = fopen(fullfile("exp", "params_file.txt"), 'at');
 MSE = fopen(fullfile("exp", "MSE.tsv"), 'at');
 bench = fopen(fullfile("exp", "bench.tsv"), 'at');
+write_file = true;
 if params_file == -1 || MSE == -1 || bench == -1
 	error('File could not be opened.');
 end
-fprintf(bench, "experiment_id\tmethod\ttime(ms)\n");
-fprintf(MSE, "experiment_id\tmethod\tdirection\tMSE\n");
+if write_file
+	fprintf(bench, "experiment_id\tmethod\ttime(ms)\n");
+end
+if write_file
+	fprintf(MSE, "experiment_id\tmethod\tdirection\tMSE\n");
+end
 
 for exp_idx=1:500
 	disp("============== Exp: " + exp_idx + " ==============")
@@ -85,16 +90,16 @@ for exp_idx=1:500
 		"west", bands ...
 		) ...
 		);
-	fprintf(params_file,"%d: %s\n", exp_idx, jsonencode(params));
+	if write_file
+		fprintf(params_file,"%d: %s\n", exp_idx, jsonencode(params));
+	end
 
 	%%%%%% mccf %%%%%%%
 	obs_mccf = obs_base;
 	tic;
 	obs_mccf = obs_mccf.apply_beam_fx(@mccf.compute_all_params, wind_shear=1, win_coeff=2);
 	t1 = toc;
-	plt_res(obs_mccf, "mccf", exp_idx, params, t1, MSE, bench);
-	clear obs_mccf;
-
+	plt_res(obs_mccf, "mccf", exp_idx, params, t1, MSE, bench, write_file);
 
 	%%%%%% ime %%%%%%%
 	obs_ime = obs_base;
@@ -103,7 +108,7 @@ for exp_idx=1:500
 	tic;
 	obs_ime = obs_ime.apply_beam_fx(@ime.estimate_params, vel_axis=obs_ime.velocities);
 	t1 = toc;
-	plt_res(obs_ime, "ime", exp_idx, params, t1, MSE, bench);
+	plt_res(obs_ime, "ime", exp_idx, params, t1, MSE, bench, write_file);
 	clear obs_ime;
 
 	%%%%%% simple %%%%%%%
@@ -113,7 +118,7 @@ for exp_idx=1:500
 	obs_simp = obs_simp.apply_beam_fx(@simple.denoise_beam);
 	obs_simp = obs_simp.apply_beam_fx(@simple.compute_moments);
 	t1 = toc;
-	plt_res(obs_simp, "simple", exp_idx, params, t1, MSE, bench);
+	plt_res(obs_simp, "simple", exp_idx, params, t1, MSE, bench, write_file);
 	clear obs_simp;
 
 	%%%%%% MC+ime denoiser+ime moment estimator %%%%%%%
@@ -123,7 +128,7 @@ for exp_idx=1:500
 	obs_hyb = obs_hyb.apply_beam_fx(@ime.denoise_beam);
 	obs_hyb = obs_hyb.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb.velocities);
 	t1 = toc;
-	plt_res(obs_hyb, "mc+den+ime", exp_idx, params, t1, MSE, bench);
+	plt_res(obs_hyb, "mc+den+ime", exp_idx, params, t1, MSE, bench, write_file);
 	clear obs_hyb;
 
 	%%%%%% MC+ime moment estimator %%%%%%%
@@ -132,21 +137,25 @@ for exp_idx=1:500
 	obs_hyb2 = obs_hyb2.apply_beam_fx(@mccf.compute_beam_spectra);
 	obs_hyb2 = obs_hyb2.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb2.velocities);
 	t1 = toc;
-	plt_res(obs_hyb2, "mc+ime", exp_idx, params, t1, MSE, bench);
+	plt_res(obs_hyb2, "mc+ime", exp_idx, params, t1, MSE, bench, write_file);
 
 	clear alts stripesD headData altitude_range params h_start h_end nRangeBins nStripes skip_dist perBinCnt bands start_idx sw idxs bds ps obs_* ;
 	close all;
 end
 
-function plt_res(obs_, name_, exp_idx, params, t, MSE, bench)
-fprintf(bench, "%d\t%s\t%f\n", exp_idx, name_, t);
+function plt_res(obs_, name_, exp_idx, params, t, MSE, bench, write_file)
+if write_file
+	fprintf(bench, "%d\t%s\t%f\n", exp_idx, name_, t);
+end
 DO_plot=false; % if need to generate plots
 for i = 1:5
 	beam = obs_.(Data.directions(i));
 	M = beam.M1;
-	M(isnan(M)) = 0;
-	params.mse = immse(beam.ref_M1 * obs_.DBS_Factor, M);
-	fprintf(MSE, "%d\t%s\t%s\t%f\n", exp_idx, name_, Data.directions(i), params.mse);
+	valid_idx = ~isnan(M);
+	params.mse = immse(beam.ref_M1(valid_idx) * obs_.DBS_Factor, M(valid_idx));
+	if write_file
+		fprintf(MSE, "%d\t%s\t%s\t%f\n", exp_idx, name_, Data.directions(i), params.mse);
+	end
 	if DO_plot
 		jsondcp = jsonencode(params);
 		f = figure('Visible', 'off', 'Units', "pixels", 'Position', [0, 0, 800, 1100]);
