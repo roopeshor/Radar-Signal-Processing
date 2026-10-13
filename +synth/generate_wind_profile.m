@@ -18,7 +18,7 @@ arguments
 	cfg.sj_s double = 0.8      % [km] Gaussian standard deviation controlling vertical thickness of the jet.
 
 	% Tropical Easterly Jet (u_tej, v_tej)
-	cfg.tej_u double = 35       % [m/s] (zonal) Strong easterly (westward) jet core speed near the tropopause.
+	cfg.tej_u double = 20       % [m/s] (zonal) Strong easterly (westward) jet core speed near the tropopause.
 	cfg.tej_v double = 3        % [m/s] (zonal) Strong easterly (westward) jet core speed near the tropopause.
 	cfg.tej_alt double = 15.0   % [km] TEJ core altitude
 	cfg.tej_vthick double = 2.5 % [km] TEJ core vertical layer thickness.
@@ -30,8 +30,8 @@ arguments
 	cfg.qbo_alt double = 17    % [km] Altitude of QBO region
 
 	% Orographic Updraft
-	cfg.ou_alpha_slope double = atan(1.5 / 30.0); % [ ] Western Ghats ridge terrain slope (1.5 km height rise over 30 km distance).
-	cfg.ou_H_lift double = 3.5;                   % [km] Vertical decay scale
+	cfg.ou_alpha_slope double = atan(3 / 20.0); % [ ] Western Ghats ridge terrain slope (1.5 km height rise over 30 km distance).
+	cfg.ou_H_lift double = 2;                   % [km] Vertical decay scale
 
 	% Continuous Gravity Wave Spectrum
 	cfg.gw_nmodes double = 20        % [ ] Number of continuous gravity wave spectrum modes
@@ -40,10 +40,11 @@ arguments
 	cfg.gw_damp_scale double = 12.0; % [km] damping scale to control upper amplitude
 	cfg.gw_cf double = 0.05          % [ ] Coupling factor deriving vertical wave speed from horizontal wave speed
 	cfg.lw_Hs double = 7.0           % [km] Density scale height for wave amplification (e^(z / 2H_s))
-	cfg.lw_N_bv double = 0.012;      % [rad/s] Brunt-Väisälä buoyancy frequency
 
-	% Atmospheric Jitter & Thermal Convection
+	% Atmospheric Jitter
 	cfg.jitter_amp double = 0.4    % [m/s] Amplitude of low-frequency spatial jet jitter
+
+	% Plumes
 	cfg.plume_count double = 4     % [ ] Number of random convective updrafts/downdrafts
 	cfg.plume_max_alt double = 6.0 % [km] Maximum altitude ceiling for thermal plumes
 
@@ -54,6 +55,7 @@ arguments
 	cfg.kt_Ric double = 0.25           % [ ] Critical Richardson Number Threshold
 	cfg.kt_tlpeak double = 3           % [km] Turbulence layer peak altitude
 	cfg.kt_vthick double = 2.5         % [km] Vertical thickness scale of turbulent layer
+	cfg.lw_N_bv double = 0.012;        % [rad/s] Brunt-Väisälä buoyancy frequency
 	cfg.turb_interm_sigma double = 0.5 % [ ] Intermittency parameter for log-normal weighting
 end
 
@@ -62,7 +64,7 @@ h = linspace(cfg.start_height, cfg.end_height, cfg.nRangeBins);
 N = length(h);
 
 %% Synoptic Background Profile
-u_bl = synth.synoptic_bg( ...
+u_bg = synth.synoptic_bg( ...
 	h, ...
 	bg_z0_m = cfg.bg_z0_m, ...
 	bg_ustar = cfg.bg_ustar, ...
@@ -98,7 +100,7 @@ u_bl = synth.synoptic_bg( ...
 	);
 
 %%horizontal components with Spatial Jitter
-u_mean = u_llj + u_bl + u_tej + u_qbo;
+u_mean = u_llj + u_bg + u_tej + u_qbo;
 v_mean = v_llj + v_tej + v_qbo;
 
 jitter_u = cfg.jitter_amp * (smoothdata(randn(N, 1), 'gaussian', 30))';
