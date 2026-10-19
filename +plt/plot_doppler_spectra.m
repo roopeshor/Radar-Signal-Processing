@@ -35,13 +35,13 @@ end
 
 imagesc(x_bounds, y_bounds, cfg.spectra);
 hold on;
-if ~isempty(cfg.comp_m)
-	plot(cfg.comp_m, cfg.heights, '-', LineWidth=cfg.plot_thickness, Color=cfg.comp_m_color);
-	legnds = [legnds, "computed"];
-end
 if ~isempty(cfg.ref_m)
 	plot(cfg.ref_m, cfg.heights, '-', LineWidth=cfg.plot_thickness, Color=cfg.ref_m_color);
 	legnds = [legnds, "ref"];
+end
+if ~isempty(cfg.comp_m)
+	plot(cfg.comp_m, cfg.heights, '-', LineWidth=cfg.plot_thickness, Color=cfg.comp_m_color);
+	legnds = [legnds, "computed"];
 end
 xlim(x_bounds);
 hold off;
