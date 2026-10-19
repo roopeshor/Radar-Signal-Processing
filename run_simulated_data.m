@@ -1,157 +1,179 @@
 % Synthesizes raw ST Radar data from randomly generated data
 % and runs all variations of pipelines
+function run_simulated_data()
+SAVE_PLOTS = true;
+fs_handle = struct("write_file", false);
+plts_folder = fullfile("simulated_run", "resim", "plots");
 
-allMethod = strings(0, 1);
-allCorr = zeros(0, 1);
-
-for exp_idx=1:50
-    alts = ["lower", "middle", "upper"];
-    stripesD = struct("lower", 4, "middle", 3, "upper", 2);
-    headData = BeamHeader.empty(0, 5);
-    altitude_range = alts(randi(3));
-    params = struct(...
-        kt_tlpeak = rand() * 5 + 10, ...
-        kt_vaf = rand()/ 5 + 0.1, ...
-        kt_bf = rand() * 5 + 1, ...
-        kt_maxT = rand() * 2 + .5, ...
-        sj_center = rand() * 2 + 1, ...
-        sj_uv = (rand() - .5) * 10, ...
-        tej_u = (rand() - .5) * 30, ...
-        tej_v = (rand() - .5) * 30, ...
-        tej_alt = rand() * 10 + 2, ...
-        qbo_lambda = (rand() * 10) + 5, ...
-        qbo_u = (rand() - .5) * 20, ...
-        qbo_v = (rand() - .5) * 20, ...
-        gw_nmodes = round(rand() * 20) + 5, ...
-        gw_amp = rand() * 2 + 1, ...
-        plume_count = round(rand() * 5) + 1, ...
-        plume_max_alt = rand() * 3 + 5, ...
-        bg_z0_m = (rand() + .5) / 100, ...
-        gw_damp_scale = rand() * 10 + 1, ...
-        qbo_alt = rand() * 10 + 5, ...
-        bg_blh = rand() + 1 ...
-    );
-
-    for i=1:5
-        headData(i) = synth.create_synthetic_beamheader(...
-            headerFields = struct("m_sCurrentBeamCnt", i - 1), ...
-            altitudeRange=altitude_range ...
-        );
-    end
-    h_start = headData(1).m_fWindow1StartHeight/1000;
-    h_end = headData(1).m_fWindow1EndHeight/1000;
-    nRangeBins = headData(1).m_sNumOfRangeBins;
-
-    nStripes = round(max(stripesD.(altitude_range), randn() * stripesD.(altitude_range) + 1));
-    skip_dist = round((nRangeBins - max(10, nStripes * 2)) / nStripes);
-    perBinCnt = max(stripesD.(altitude_range)-1, round(abs(rand(1, nStripes)) * 3));
-    bands= [];
-    for i = 1:nStripes
-        start_idx = (i - 1) * skip_dist + round(min(skip_dist - perBinCnt(i), rand() * skip_dist/3));
-        sw = max(5, abs(randn(1, perBinCnt(i) + 1) * 6 + 4));
-        idxs = start_idx + (1:(perBinCnt(i) + 1));
-        bds = [idxs', sw'];
-        bands = [bands; bds];
-    end
-
-    ps = namedargs2cell(params);
-    [z, u, v, w] = synth.generate_wind_profile( ...
-        "nRangeBins", nRangeBins, ...
-        "start_height", h_start, ...
-        "end_height", h_end, ...
-        ps{:} ...
-    );
-
-    params.gc_rel_power = rand() / 200 + 0.0005;
-    params.bands = bands;
-    params.altitude_range = altitude_range;
-    obs_base = synth.create_synthetic_observation(...
-        u, v, w,...
-        SNR = 10 .^ (linspace(50, -35, nRangeBins)/10), ...
-        dc_rel_power = .2, ...
-        gc_rel_power = params.gc_rel_power, ...
-        headerFields = headData, ...
-        bright_bands = struct(...
-            "north", bands, ...
-            "south", bands, ...
-            "east", bands, ...
-            "west", bands ...
-        ) ...
-    );
-
-    %%%%%% mccf %%%%%%%
-    obs_mccf = obs_base;
-    obs_mccf = obs_mccf.apply_beam_fx(@mccf.compute_all_params, wind_shear=1, win_coeff=2);
-    r = corr_res(obs_mccf);
-    allMethod = [allMethod; repmat("mccf", numel(r), 1)];
-    allCorr = [allCorr; r];
-
-    %%%%%% ime %%%%%%%
-    obs_ime = obs_base;
-    obs_ime = obs_ime.apply_beam_fx(@ime.compute_beam_spectra);
-    obs_ime = obs_ime.apply_beam_fx(@ime.denoise_beam);
-    obs_ime = obs_ime.apply_beam_fx(@ime.estimate_params, vel_axis=obs_ime.velocities);
-    r = corr_res(obs_ime);
-    allMethod = [allMethod; repmat("ime", numel(r), 1)];
-    allCorr = [allCorr; r];
-    clear obs_ime;
-
-    %%%%%% simple %%%%%%%
-    obs_simp = obs_base;
-    obs_simp = obs_simp.apply_beam_fx(@simple.compute_beam_spectra);
-    obs_simp = obs_simp.apply_beam_fx(@simple.denoise_beam);
-    obs_simp = obs_simp.apply_beam_fx(@simple.compute_moments);
-    r = corr_res(obs_simp);
-    allMethod = [allMethod; repmat("simple", numel(r), 1)];
-    allCorr = [allCorr; r];
-    clear obs_simp;
-
-    %%%%%% MC+ime denoiser+ime moment estimator %%%%%%%
-    obs_hyb = obs_base;
-    obs_hyb = obs_hyb.apply_beam_fx(@mccf.compute_beam_spectra);
-    obs_hyb = obs_hyb.apply_beam_fx(@ime.denoise_beam);
-    obs_hyb = obs_hyb.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb.velocities);
-    r = corr_res(obs_hyb);
-    allMethod = [allMethod; repmat("mc+den+ime", numel(r), 1)];
-    allCorr = [allCorr; r];
-    clear obs_hyb;
-
-    %%%%%% MC+ime moment estimator %%%%%%%
-    obs_hyb2 = obs_base;
-    obs_hyb2 = obs_hyb2.apply_beam_fx(@mccf.compute_beam_spectra);
-    obs_hyb2 = obs_hyb2.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb2.velocities);
-    r = corr_res(obs_hyb2);
-    allMethod = [allMethod; repmat("mc+ime", numel(r), 1)];
-    allCorr = [allCorr; r];
-    clear obs_hyb2;
-
-    clear alts stripesD headData altitude_range params h_start h_end nRangeBins nStripes skip_dist perBinCnt bands start_idx sw idxs bds ps r obs_* ;
-    close all;
+if ~isfolder(plts_folder)
+	mkdir(plts_folder)
 end
+exp_idx = 1000;
+headData = BeamHeader.empty(0, 5);
+params2 = struct(...
+	"kt_tlpeak", 14.60564281169048,...
+	"kt_vaf", 0.17906955266781976,...
+	"kt_bf", 1.7765396928411699,...
+	"kt_maxT", 1.0521255599267363,...
+	"sj_center", 2.2675645035022187,...
+	"sj_uv", 2.7967976503799341,...
+	"tej_u", -5.691742621985588,...
+	"tej_v", -9.0737746025802615,...
+	"tej_alt", 8.1136475647643351,...
+	"qbo_lambda", 5.5135442681595865,...
+	"qbo_u", 5.4808548811876339,...
+	"qbo_v", -1.9849677907331609,...
+	"gw_nmodes", 18,...
+	"gw_amp", 2.3585711315869187,...
+	"plume_count", 3,...
+	"plume_max_alt", 7.2901747212312564,...
+	"bg_z0_m", 0.010797928616405085,...
+	"gw_damp_scale", 4.7483947409973783,...
+	"qbo_alt", 12.259814224416127,...
+	"bg_blh", 1.2940091542088661...
+	);
+params = params2;
+params.gc_rel_power = 0.0036870949190243346;
+params.bands = [[8,5];[9,5];[10,9.4089300193476];[11,5];[50,5];[51,6.2067438260920014];[52,7.3565632970496884];[53,14.232862187896071];[95,5];[96,5];[97,5];[98,5];[134,5];[135,5];[136,5];[137,17.545456908090912]];
+params.altitude_range = "lower";
+stringified_param = jsonencode(params);
+for i=1:5
+	headData(i) = synth.create_synthetic_beamheader(...
+		headerFields = struct("m_sCurrentBeamCnt", i - 1), ...
+		altitudeRange=params.altitude_range ...
+		);
+end
+h_start = headData(1).m_fWindow1StartHeight/1000;
+h_end = headData(1).m_fWindow1EndHeight/1000;
+nRangeBins = headData(1).m_sNumOfRangeBins;
 
-order = ["simple", "ime", "mccf", "mc+ime", "mc+den+ime"];
-figure;
-boxchart(categorical(allMethod, order), allCorr);
-xlabel("Method");
-ylabel("Correlation coefficient");
-title("Correlation coefficient comparison (50 experiments)");
-grid on;
-saveas(gcf, "corr_boxplot.png");
+ps = namedargs2cell(params2);
+[~, u, v, w] = synth.generate_wind_profile( ...
+	"nRangeBins", nRangeBins, ...
+	"start_height", h_start, ...
+	"end_height", h_end, ...
+	ps{:} ...
+	);
 
-function r = corr_res(obs_)
-    r = nan(5, 1);
-    for i = 1:5
-        beam = obs_.(Data.directions(i));
-        M = beam.M1;
-        valid_idx = ~isnan(M);
-        ref = beam.ref_M1(valid_idx) * obs_.DBS_Factor;
-        est = M(valid_idx);
-        ok = ~isnan(ref(:)) & ~isnan(est(:));
-        ref = ref(ok);
-        est = est(ok);
-        if numel(est) > 1 && std(ref) > 0 && std(est) > 0
-            R = corrcoef(ref(:), est(:));
-            r(i) = R(1, 2);
-        end
-    end
+obs_base = synth.create_synthetic_observation(...
+	u, v, w,...
+	SNR = 10 .^ (linspace(50, -35, nRangeBins)/10), ...
+	dc_rel_power = .2, ...
+	gc_rel_power = params.gc_rel_power, ...
+	headerFields = headData, ...
+	bright_bands = struct(...
+	"north", params.bands, ...
+	"south", params.bands, ...
+	"east", params.bands, ...
+	"west", params.bands ...
+	) ...
+	);
+
+%%%%%% ime %%%%%%%
+disp("running ime")
+obs_ime = obs_base;
+tic;
+obs_ime = obs_ime.apply_beam_fx(@ime.compute_beam_spectra);
+obs_ime = obs_ime.apply_beam_fx(@ime.denoise_beam);
+obs_ime = obs_ime.apply_beam_fx(@ime.estimate_params, vel_axis=obs_ime.velocities);
+elapsed = toc;
+beam_valid_bin_masks = struct(...
+	"north", ~isnan(obs_ime.north.M1) , ...
+	"east", ~isnan(obs_ime.east.M1) , ...
+	"west", ~isnan(obs_ime.west.M1) , ...
+	"south", ~isnan(obs_ime.south.M1) , ...
+	"vertical", ~isnan(obs_ime.vertical.M1) ...
+	);
+plot_results(obs_ime, "ime", exp_idx, params, elapsed, beam_valid_bin_masks);
+clear obs_ime;
+
+%%%%%% mccf %%%%%%%
+
+obs_mccf = obs_base;
+disp("running mccf")
+tic;
+obs_mccf = obs_mccf.apply_beam_fx(@mccf.compute_all_params, wind_shear=1, win_coeff=2);
+elapsed = toc;
+plot_results(obs_mccf, "mccf", exp_idx, params, elapsed, beam_valid_bin_masks);
+
+
+%%%%%% simple %%%%%%%
+
+obs_simp = obs_base;
+disp("running simple")
+tic;
+obs_simp = obs_simp.apply_beam_fx(@simple.compute_beam_spectra);
+obs_simp = obs_simp.apply_beam_fx(@simple.denoise_beam);
+obs_simp = obs_simp.apply_beam_fx(@simple.compute_moments);
+elapsed = toc;
+plot_results(obs_simp, "simple", exp_idx, params, elapsed, beam_valid_bin_masks);
+clear obs_simp;
+
+%%%%%% MC+ime denoiser+ime moment estimator %%%%%%%
+
+obs_hyb = obs_base;
+disp("running MC+ime denoiser+ime")
+tic;
+obs_hyb = obs_hyb.apply_beam_fx(@mccf.compute_beam_spectra);
+obs_hyb = obs_hyb.apply_beam_fx(@ime.denoise_beam);
+obs_hyb = obs_hyb.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb.velocities);
+elapsed = toc;
+plot_results(obs_hyb, "mc+den+ime", exp_idx, params, elapsed, beam_valid_bin_masks);
+clear obs_hyb;
+
+%%%%%% MC+ime moment estimator %%%%%%%
+
+obs_hyb2 = obs_base;
+disp("running MC+ime")
+tic;
+obs_hyb2 = obs_hyb2.apply_beam_fx(@mccf.compute_beam_spectra);
+obs_hyb2 = obs_hyb2.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb2.velocities);
+elapsed = toc;
+plot_results(obs_hyb2, "mc+ime", exp_idx, params, elapsed, beam_valid_bin_masks);
+
+clear params* obs_* ;
+
+	function plot_results(obs, method_name, exp_idx, params, t, beamMasks)
+		if fs_handle.write_file
+			fprintf(fs_handle.bench, "%d\t%s\t%f\n", exp_idx, method_name, t);
+		end
+		for idx = 1:5
+			beam_dir = Data.directions(idx);
+			alt_mask = beamMasks.(beam_dir);
+			beam = obs.(beam_dir);
+			M = beam.M1(alt_mask);
+			ref = beam.ref_M1(alt_mask) * obs.DBS_Factor;
+
+			params.mse = immse(ref, M);
+			R = corrcoef(ref, M);
+			params.corr = R(1, 2);
+
+			if fs_handle.write_file
+				fprintf(fs_handle.MSE, "%d\t%s\t%s\t%f\n", exp_idx, method_name, beam_dir, params.mse);
+				fprintf(fs_handle.corr_file, "%d\t%s\t%s\t%f\n", exp_idx, method_name, beam_dir, params.corr);
+			end
+
+			if SAVE_PLOTS
+				f = figure('Visible', 'off', 'Units', "pixels", 'Position', [0, 0, 800, 1100]);
+				theme(f, 'light');
+				data = 20*log10(abs(beam.spectra));
+				plt.plot_doppler_spectra(...
+					spectra   = data,                           ...
+					direction = beam.direction,                 ...
+					ref_m     = -beam.ref_M1 * obs.DBS_Factor, ...
+					comp_m    = -beam.M1 * obs.DBS_Factor,                             ...
+					heights   = obs.heights/1000,              ...
+					x_max     = obs.v_max          ...
+					)
+				colorbar
+				clim([-150,0]);
+				set(groot, 'defaultAxesFontSize', 20)
+				plt_file = fullfile(plts_folder, exp_idx + "_"+method_name+"_" + idx + ".png");
+				imwrite(getframe(f).cdata, plt_file, ...
+					'Comment', jsonencode(params) ...
+					);
+				close(f)
+			end
+		end
+	end
 end
