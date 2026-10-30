@@ -41,6 +41,7 @@ end
 figure;
 boxplot(CORR.Correlation, CORR.method);
 ylabel('Correlation');
+set(gca, 'YScale', 'log');
 figure;
 boxplot(MSE.MSE, MSE.method);
 set(gca, 'YScale', 'log');
@@ -59,6 +60,7 @@ exportgraphics(gcf, fullfile(folder, 'MSE_summary.svg'), 'Resolution', 400);
 f = figure('Name','Summary');
 theme(f, "light")
 bar(meanCORR);
+set(gca, 'YScale', 'log');
 set(gca, 'XTickLabel', methods);
 legend(beams, 'Location','northeastoutside');
 ylabel('Mean CORR'); title('Mean CORR per beam, all algorithms'); grid on

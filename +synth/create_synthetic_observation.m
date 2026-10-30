@@ -13,7 +13,6 @@ arguments (Input)
 	w (1, :) double
 	% Custom header property overrides.
 	cfg.headerFields (1, 5) BeamHeader
-	cfg.altitudeRange = "middle"
 	% Destination filepath to save synthetic .raw binary file.
 	cfg.filepath string = ""
 

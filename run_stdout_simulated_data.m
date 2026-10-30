@@ -12,8 +12,13 @@ arguments
 end
 %%%%% IO opers
 res_folder = fullfile("simulated_run", folder_name);
+plts_folder = fullfile(res_folder, "plots");
 if ~isfolder(res_folder)
 	mkdir(res_folder);
+end
+
+if ~isfolder(plts_folder)
+	mkdir(plts_folder);
 end
 
 params_file = fopen(fullfile(res_folder, "params_file.txt"), 'at');
@@ -23,7 +28,7 @@ bench       = fopen(fullfile(res_folder, "bench.tsv"), 'at');
 
 SAVE_DATA = true;
 % to save generate plots
-SAVE_PLOTS=false;
+SAVE_PLOTS=true;
 
 if params_file == -1 || MSE == -1 || bench == -1 || corr_file == -1
 	error('File could not be opened.');
@@ -220,7 +225,8 @@ end
 				colorbar
 				clim([-150,0]);
 				set(groot, 'defaultAxesFontSize', 20)
-				plt_file = fullfile(res_folder, "plots", exp_idx + "_"+method_name+"_" + idx + ".png");
+				plt_file = fullfile(plts_folder, exp_idx + "_"+method_name+"_" + idx + ".png");
+				stringified_param = jsonencode(params);
 				imwrite(getframe(f).cdata, plt_file, ...
 					'Comment', stringified_param ...
 					);
