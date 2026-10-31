@@ -49,7 +49,7 @@ All other files are derived by adding a suitable extension to this base name. Th
 To read an observation, an object is created from `Observation` class with _path_ of observation passed to it:
 ```matlab
 filepath = fullfile("Data" , "EXP_DBS_CH4_29Jul2026_16_16_17");
-obs = Observation(filepath);
+obs = getObservation(filepath);
 ```
 the `obs` is like a `struct` and has following things in it (see [@Observation/Observation.m](@Observation/Observation.m)):
 
@@ -78,7 +78,7 @@ Instantiate an `Observation` object using the base filename path. The parser aut
 
 ```matlab
 filepath = fullfile("Data", "EXP_DBS_CH4_29Jul2026_19_17_20");
-obs = Observation(filepath);
+obs = getObservation(filepath);
 ```
 
 ### Processing Pipeline via Hot-Swappable Endpoints
@@ -87,16 +87,16 @@ Methods (`+ime`, `@mccf`, `@st`, `@simple`) export standardized function handles
 
 ```matlab
 % Example: IME Method (+ime)
-obs = obs.apply_beam_fx(@ime.compute_beam_spectra);
-obs = obs.apply_beam_fx(@ime.denoise_beam);
-obs = obs.apply_beam_fx(@ime.estimate_params, vel_axis=obs.velocities);
-obs = obs.apply_beam_fx(@ime.compute_moments);
+obs = apply_beam_fx(obs, @ime.compute_beam_spectra);
+obs = apply_beam_fx(obs, @ime.denoise_beam);
+obs = apply_beam_fx(obs, @ime.estimate_params, vel_axis=obs.velocities);
+obs = apply_beam_fx(obs, @ime.compute_moments);
 obs = utils.compute_uvw(obs);
 
 % Example: MCCF Method (+mccf)
-obs = obs.apply_beam_fx(@mccf.compute_beam_spectra);
-obs = obs.apply_beam_fx(@simple.denoise_beam);
-obs = obs.apply_beam_fx(@mccf.compute_moments);
+obs = apply_beam_fx(obs, @mccf.compute_beam_spectra);
+obs = apply_beam_fx(obs, @simple.denoise_beam);
+obs = apply_beam_fx(obs, @mccf.compute_moments);
 ```
 
 ### Extracting Wind Profiles (DBS Equations)

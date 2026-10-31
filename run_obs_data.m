@@ -1,9 +1,9 @@
 filepath = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_19_22_59");
 disp("Processing file: " + filepath);
 
-obs = Observation(filepath);
-obs = obs.apply_beam_fx(@mccf.compute_all_params);
-% obs = obs.apply_beam_fx(@ime.estimate_params, vel_axis=obs.velocities);
+obs = getObservation(filepath);
+obs = apply_beam_fx(obs, @mccf.compute_all_params);
+% obs = apply_beam_fx(obs, @ime.estimate_params, vel_axis=obs.velocities);
 obs = utils.compute_uvw(obs);
 
 N = obs.north;

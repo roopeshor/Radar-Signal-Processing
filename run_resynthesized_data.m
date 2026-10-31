@@ -3,8 +3,8 @@
 filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15.raw");
 disp("Processing file: " + filepath);
 
-obs = Observation(filepath);
-obs = obs.apply_beam_fx(@simple.compute_beam_spectra);
+obs = getObservation(filepath);
+obs = apply_beam_fx(obs, @simple.compute_beam_spectra);
 
 u = obs.ref_U;
 v = obs.ref_V;
@@ -16,7 +16,7 @@ syn = synth.create_synthetic_observation(...
 );
 
 disp("Computing Spectra...");
-syn = syn.apply_beam_fx(@mccf.compute_beam_spectra);
+syn = apply_beam_fx(syn, @mccf.compute_beam_spectra);
 
 for i = 1:5
 	d = Data.directions(i);

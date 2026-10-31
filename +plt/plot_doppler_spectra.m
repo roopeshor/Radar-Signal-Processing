@@ -51,7 +51,7 @@ colormap('Parula');
 
 xlabel("Doppler " + cfg.x_axis_type + " (m/s)");
 ylabel('Altitude (km)');
-title(cfg.direction);
+% title(cfg.direction);
 
 if cfg.add_legend && ~isempty(legnds)
 	legend(legnds);

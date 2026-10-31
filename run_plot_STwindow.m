@@ -1,8 +1,8 @@
 filepath = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_16_16_17");
 disp("Processing file: " + filepath);
 
-obs = Observation(filepath);
-obs = obs.apply_beam_fx(@mccf.compute_all_params, win_coeff=1.5);
+obs = getObservation(filepath);
+obs = apply_beam_fx(obs, @mccf.compute_all_params, win_coeff=1.5);
 N = obs.north;
 
 figure("Name", "ST Window");
@@ -18,13 +18,7 @@ spec = N.spectra(i1:i2, vidx(1):vidx(2));
 compm = M(i1:i2);
 refm = N.ref_M1(i1:i2) * obs.DBS_Factor;
 stw = N.a_params.mccf_ST_W(i1:i2, :);
-subplot(1,2,1);
-plt.plot_doppler_spectra(...
-	spectra    = 20*abs(spec), ...
-	heights    = heights,             ...
-	x_max      = vl(2)               ...
-	)
-subplot(1,2,2);
+
 plt.plot_doppler_spectra(...
 	spectra    = 20*log10(abs(spec)), ...
 	heights    = heights,             ...

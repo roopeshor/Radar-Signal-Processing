@@ -72,7 +72,7 @@ for k = 1:5
 end
 
 if cfg.filepath ~= ""; io.write_raw_file(Headers, cfg.filepath); end
-obj = Observation(Headers);
+obj = getObservation(Headers);
 
 obj.ref_height = z;
 obj.ref_U = u;

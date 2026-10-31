@@ -3,9 +3,9 @@
 filepath = fullfile("Data" , "rain", "EXP_DBS_CH4_28Jun2026_14_28_16");
 disp("Processing file: " + filepath);
 
-obs = Observation(filepath, add_mmts=false, add_uvw=false);
-obs = obs.apply_beam_fx(@mccf.compute_beam_spectra);
-obs = obs.apply_beam_fx(@simple.denoise_beam);
+obs = getObservation(filepath, add_mmts=false, add_uvw=false);
+obs = apply_beam_fx(obs, @mccf.compute_beam_spectra);
+obs = apply_beam_fx(obs, @simple.denoise_beam);
 
 data = obs.north.denoised_spectra;
 plt.plot_doppler_spectra(...

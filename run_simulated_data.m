@@ -36,7 +36,7 @@ params = params2;
 params.gc_rel_power = 0.0036870949190243346;
 params.bands = [[8,5];[9,5];[10,9.4089300193476];[11,5];[50,5];[51,6.2067438260920014];[52,7.3565632970496884];[53,14.232862187896071];[95,5];[96,5];[97,5];[98,5];[134,5];[135,5];[136,5];[137,17.545456908090912]];
 params.altitude_range = "lower";
-stringified_param = jsonencode(params);
+% stringified_param = jsonencode(params);
 for i=1:5
 	headData(i) = synth.create_synthetic_beamheader(...
 		headerFields = struct("m_sCurrentBeamCnt", i - 1), ...
@@ -73,9 +73,9 @@ obs_base = synth.create_synthetic_observation(...
 disp("running ime")
 obs_ime = obs_base;
 tic;
-obs_ime = obs_ime.apply_beam_fx(@ime.compute_beam_spectra);
-obs_ime = obs_ime.apply_beam_fx(@ime.denoise_beam);
-obs_ime = obs_ime.apply_beam_fx(@ime.estimate_params, vel_axis=obs_ime.velocities);
+obs_ime = apply_beam_fx(obs_ime, @ime.compute_beam_spectra);
+obs_ime = apply_beam_fx(obs_ime, @ime.denoise_beam);
+obs_ime = apply_beam_fx(obs_ime, @ime.estimate_params, vel_axis=obs_ime.velocities);
 elapsed = toc;
 beam_valid_bin_masks = struct(...
 	"north", ~isnan(obs_ime.north.M1) , ...
@@ -92,44 +92,44 @@ clear obs_ime;
 obs_mccf = obs_base;
 disp("running mccf")
 tic;
-obs_mccf = obs_mccf.apply_beam_fx(@mccf.compute_all_params, wind_shear=1, win_coeff=2);
+obs_mccf = apply_beam_fx(obs_mccf, @mccf.compute_all_params, wind_shear=1, win_coeff=2);
 elapsed = toc;
 plot_results(obs_mccf, "mccf", exp_idx, params, elapsed, beam_valid_bin_masks);
 
 
-%%%%%% simple %%%%%%%
+% %%%%%% simple %%%%%%%
 
-obs_simp = obs_base;
-disp("running simple")
-tic;
-obs_simp = obs_simp.apply_beam_fx(@simple.compute_beam_spectra);
-obs_simp = obs_simp.apply_beam_fx(@simple.denoise_beam);
-obs_simp = obs_simp.apply_beam_fx(@simple.compute_moments);
-elapsed = toc;
-plot_results(obs_simp, "simple", exp_idx, params, elapsed, beam_valid_bin_masks);
-clear obs_simp;
+% obs_simp = obs_base;
+% disp("running simple")
+% tic;
+% obs_simp = apply_beam_fx(obs_simp, @simple.compute_beam_spectra);
+% obs_simp = apply_beam_fx(obs_simp, @simple.denoise_beam);
+% obs_simp = apply_beam_fx(obs_simp, @simple.compute_moments);
+% elapsed = toc;
+% plot_results(obs_simp, "simple", exp_idx, params, elapsed, beam_valid_bin_masks);
+% clear obs_simp;
 
-%%%%%% MC+ime denoiser+ime moment estimator %%%%%%%
+% %%%%%% MC+ime denoiser+ime moment estimator %%%%%%%
 
-obs_hyb = obs_base;
-disp("running MC+ime denoiser+ime")
-tic;
-obs_hyb = obs_hyb.apply_beam_fx(@mccf.compute_beam_spectra);
-obs_hyb = obs_hyb.apply_beam_fx(@ime.denoise_beam);
-obs_hyb = obs_hyb.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb.velocities);
-elapsed = toc;
-plot_results(obs_hyb, "mc+den+ime", exp_idx, params, elapsed, beam_valid_bin_masks);
-clear obs_hyb;
+% obs_hyb = obs_base;
+% disp("running MC+ime denoiser+ime")
+% tic;
+% obs_hyb = apply_beam_fx(obs_hyb, @mccf.compute_beam_spectra);
+% obs_hyb = apply_beam_fx(obs_hyb, @ime.denoise_beam);
+% obs_hyb = apply_beam_fx(obs_hyb, @ime.estimate_params, vel_axis=obs_hyb.velocities);
+% elapsed = toc;
+% plot_results(obs_hyb, "mc+den+ime", exp_idx, params, elapsed, beam_valid_bin_masks);
+% clear obs_hyb;
 
-%%%%%% MC+ime moment estimator %%%%%%%
+% %%%%%% MC+ime moment estimator %%%%%%%
 
-obs_hyb2 = obs_base;
-disp("running MC+ime")
-tic;
-obs_hyb2 = obs_hyb2.apply_beam_fx(@mccf.compute_beam_spectra);
-obs_hyb2 = obs_hyb2.apply_beam_fx(@ime.estimate_params, vel_axis=obs_hyb2.velocities);
-elapsed = toc;
-plot_results(obs_hyb2, "mc+ime", exp_idx, params, elapsed, beam_valid_bin_masks);
+% obs_hyb2 = obs_base;
+% disp("running MC+ime")
+% tic;
+% obs_hyb2 = apply_beam_fx(obs_hyb2, @mccf.compute_beam_spectra);
+% obs_hyb2 = apply_beam_fx(obs_hyb2, @ime.estimate_params, vel_axis=obs_hyb2.velocities);
+% elapsed = toc;
+% plot_results(obs_hyb2, "mc+ime", exp_idx, params, elapsed, beam_valid_bin_masks);
 
 clear params* obs_* ;
 
@@ -154,7 +154,7 @@ clear params* obs_* ;
 			end
 
 			if SAVE_PLOTS
-				f = figure('Visible', 'off', 'Units', "pixels", 'Position', [0, 0, 800, 1100]);
+				f = figure('Visible', 'off', 'Units', "pixels", 'Position', [0, 0, 800, 1100], 'Color', "white");
 				theme(f, 'light');
 				data = 20*log10(abs(beam.spectra));
 				plt.plot_doppler_spectra(...
@@ -169,6 +169,22 @@ clear params* obs_* ;
 				clim([-150,0]);
 				set(groot, 'defaultAxesFontSize', 20)
 				plt_file = fullfile(plts_folder, exp_idx + "_"+method_name+"_" + idx + ".png");
+				imwrite(getframe(f).cdata, plt_file, ...
+					'Comment', jsonencode(params) ...
+					);
+				f = figure('Visible', 'off', 'Units', "pixels", 'Position', [0, 0, 800, 1100], 'Color', "white");
+				theme(f, 'light');
+				data = 20*log10(abs(beam.spectra));
+				plt.plot_doppler_spectra(...
+					spectra   = data,                           ...
+					direction = beam.direction,                 ...
+					heights   = obs.heights/1000,              ...
+					x_max     = obs.v_max          ...
+					)
+				colorbar
+				clim([-150,0]);
+				set(groot, 'defaultAxesFontSize', 20)
+				plt_file = fullfile(plts_folder, "raw_"+exp_idx + "_"+method_name+"_" + idx + ".png");
 				imwrite(getframe(f).cdata, plt_file, ...
 					'Comment', jsonencode(params) ...
 					);
