@@ -6,7 +6,6 @@ ST Radar wind profile estimation algorithms in NEWS+Z directions.
 A group of algorithms related to a method are organized into package directories prefixed with `+` (matlab's convention).
 
 ```
-├── @BeamHeader/BeamHeader.m    |
 ├── @Data/Data.m                |
 ├── @Observation/Observation.m  ├ Data Structures & constants
 ├── @RadarData/RadarData.m      |

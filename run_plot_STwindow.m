@@ -1,3 +1,4 @@
+clear all; close all;
 filepath = fullfile("Data", "other", "EXP_DBS_CH4_29Jul2026_16_16_17");
 disp("Processing file: " + filepath);
 

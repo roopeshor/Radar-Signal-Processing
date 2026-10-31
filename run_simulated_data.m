@@ -1,6 +1,7 @@
 % Synthesizes raw ST Radar data from randomly generated data
 % and runs all variations of pipelines
 function run_simulated_data()
+	clc; clear all; close all;
 SAVE_PLOTS = true;
 fs_handle = struct("write_file", false);
 plts_folder = fullfile("simulated_run", "resim", "plots");
@@ -9,7 +10,7 @@ if ~isfolder(plts_folder)
 	mkdir(plts_folder)
 end
 exp_idx = 1000;
-headData = BeamHeader.empty(0, 5);
+headData = RadarData.empty(0, 5);
 params2 = struct(...
 	"kt_tlpeak", 14.60564281169048,...
 	"kt_vaf", 0.17906955266781976,...
@@ -188,7 +189,7 @@ clear params* obs_* ;
 				imwrite(getframe(f).cdata, plt_file, ...
 					'Comment', jsonencode(params) ...
 					);
-				close(f)
+				% close(f)
 			end
 		end
 	end

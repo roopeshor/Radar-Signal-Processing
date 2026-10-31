@@ -117,7 +117,7 @@ end
 	function [obs_base, params] = gen_rand_data()
 		alts = ["lower", "middle", "upper"];
 		stripesD = struct("lower", 4, "middle", 3, "upper", 2);
-		headData = BeamHeader.empty(0, 5);
+		headData = RadarData.empty(0, 5);
 		altitude_range = alts(randi(3));
 
 		params = struct(...

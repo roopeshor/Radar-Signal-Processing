@@ -55,13 +55,15 @@ obs.DBS_Factor_H = vel_factor / (2 * sind(obs.north.m_fOffZenith));
 
 obs.f_max = utils.compute_max_freq(obs.north.ipp_us, obs.north.n_coh);
 obs.v_max = obs.f_max * vel_factor; % DBS_V
-obs.start_height = obs.north.start_height;
-obs.end_height = obs.north.end_height;
-obs.nRangeBins = obs.north.nRangeBins;
-obs.nFFT = obs.north.nFFT;
-obs.ipp_us = obs.north.ipp_us;
-obs.in_coh = obs.north.in_coh;
-obs.n_coh = obs.north.n_coh;
+
+obs.ipp_us = obs.north.m_fIntrPulsePeriod_us;
+obs.n_coh = obs.north.m_sNumOfCohIntegrations;
+obs.in_coh = obs.north.m_sNumOfInCohIntegrations;
+obs.start_height = obs.north.m_fWindow1StartHeight;
+obs.end_height = obs.north.m_fWindow1EndHeight;
+obs.nRangeBins = obs.north.m_sNumOfRangeBins;
+obs.nFFT = obs.north.m_sNFFT;
+
 obs.heights = utils.compute_height_bins(...
 	obs.start_height, ...
 	obs.end_height, ...

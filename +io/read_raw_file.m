@@ -114,7 +114,7 @@ for beam_No = 1:beam_count
 	dataBlockSize = nRangeBins * nNFFT;
 
 	Header(beam_No).BeamData = zeros(nRangeBins, nNFFT, nInCoh);
-	Header(beam_No) = Header(beam_No).init_parms();
+	Header(beam_No) = utils.add_extra_RD_params(Header(beam_No));
 	for InCohIntegration = 1:nInCoh
 		if InCohIntegration ~= 1
 			[~, headerDataCount] = fread(fPtr, 1024, 'int8');

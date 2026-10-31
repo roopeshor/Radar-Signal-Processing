@@ -1,4 +1,4 @@
-function BeamData = synthesize_iq_data_vectrzd(cfg)
+function BeamData = synthesize_iq_data(cfg)
 % Synthesizes complex IQ time-series data using Zrnic spectral simulation.
 %
 %   Generates Gaussian power spectrum signatures modeled on Doppler velocity, spectral width, and SNR,
@@ -7,8 +7,8 @@ function BeamData = synthesize_iq_data_vectrzd(cfg)
 arguments (Input)
 	% Radial velocity profile vector (m/s).
 	cfg.vr (1, :) double
-	% BeamHeader object containing NFFT, RangeBins, IPP, and coherent integration parameters.
-	cfg.Header BeamHeader
+	% RadarData object containing NFFT, RangeBins, IPP, and coherent integration parameters.
+	cfg.Header RadarData
 	% Spectral width (m/s).
 	cfg.spec_w (1, :) double
 	% Signal-to-noise ratio array across range bins.
@@ -31,10 +31,10 @@ arguments (Output)
 	BeamData (:, :, :) double
 end
 
-NFFT = cfg.Header.m_sNFFT;
-nRangeBins = cfg.Header.m_sNumOfRangeBins;
-ipp_us = cfg.Header.m_fIntrPulsePeriod_us;
-cohIn = cfg.Header.m_sNumOfCohIntegrations;
+NFFT = cfg.Header.nFFT;
+nRangeBins = cfg.Header.nRangeBins;
+ipp_us = cfg.Header.ipp_us;
+cohIn = cfg.Header.n_coh;
 
 P_noise = 1000;
 wavelen  = 3e8 / 205e6;

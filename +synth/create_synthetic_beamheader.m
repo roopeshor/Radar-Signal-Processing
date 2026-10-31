@@ -1,21 +1,21 @@
 function H = create_synthetic_beamheader(config)
-% synth.create_synthetic_beamheader Generates a synthetic BeamHeader object for simulation and testing.
+% synth.create_synthetic_beamheader Generates a synthetic RadarData object for simulation and testing.
 %
 %   Constructs default 52-field radar header structures configured for lower (tropospheric),
 %   middle (stratospheric), or upper altitude modes, with optional custom property overrides.
 
 arguments (Input)
-	% Custom header property overrides (struct or BeamHeader).
+	% Custom header property overrides (struct or RadarData).
 	config.headerFields = struct()
 	% Altitude mode configuration selector ("lower", "middle", "upper").
 	config.altitudeRange string = "lower"
 end
 arguments (Output)
-	% Synthesized BeamHeader object.
-	H BeamHeader
+	% Synthesized RadarData object.
+	H RadarData
 end
 
-H = BeamHeader();
+H = RadarData();
 
 H.m_sMagicNumber               = 369;
 H.m_sNFFT                      = 1024;
@@ -105,4 +105,7 @@ if (H.m_sCurrentBeamCnt == 0); H.m_fOffZenith = 0;
 else; H.m_fOffZenith = 10; end
 
 H.m_fAzimuth = Data.cnt2az(H.m_sCurrentBeamCnt);
+
+% aliases
+H = utils.add_extra_RD_params(H);
 end

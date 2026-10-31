@@ -57,6 +57,7 @@ for i = 1:5
 			beam.ref_M2 = output.("M2 Doppler Spread (Hz)");
 			beam.ref_SNR = output.("SNR (dB)");
 			beam.ref_noise_level = output.("Noise Level (dBm)");
+			beam.direction = Data.aoz2dir(az=beam.m_fAzimuth, oz=beam.m_fOffZenith);
 
 		end
 	end

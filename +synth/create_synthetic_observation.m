@@ -12,7 +12,7 @@ arguments (Input)
 	% Vertical wind profile vector (m/s).
 	w (1, :) double
 	% Custom header property overrides.
-	cfg.headerFields (1, 5) BeamHeader
+	cfg.headerFields (1, 5) RadarData
 	% Destination filepath to save synthetic .raw binary file.
 	cfg.filepath string = ""
 
@@ -47,7 +47,7 @@ DBS_V = 3.0e8 / 205e6 / 2.0;
 
 for k = 1:5
 	H = cfg.headerFields(k);
-	Headers(k) = RadarData(H);
+	Headers(k) = H;
 	vr = utils.compute_radial_velocity(u, v, w, H.m_fAzimuth, H.m_fOffZenith);
 	sv = cfg.sigma_v;
 	if (class(sv) == "string")

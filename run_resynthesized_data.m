@@ -1,5 +1,5 @@
 % This file was created to test if the raw file synthesizer is correctly creating the required raw file
-
+clear all; close all;
 filepath = fullfile("Data" , "other", "EXP_DBS_CH4_29Jul2026_16_23_15.raw");
 disp("Processing file: " + filepath);
 

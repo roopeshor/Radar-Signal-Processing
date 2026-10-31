@@ -5,7 +5,6 @@ function vel_axis = compute_velocity_bins(nfft, ipp, n_coh)
 %   and converts to radial velocity v = - lambda * fd / 2.
 
 arguments (Input)
-	% BeamHeader or RadarData beam object.
 	nfft (1, 1) double % number of FFT points
 	ipp (1, 1) double % m_fIntrPulsePeriod_us
 	n_coh (1, 1) double % number of incoherent integration
