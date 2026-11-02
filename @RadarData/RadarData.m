@@ -59,36 +59,35 @@ classdef RadarData
 		m_fWindow4EndHeight          (1, 1) double  % observation window 4 end altitude (km)
 		m_fWindow5StartHeight        (1, 1) double  % observation window 5 start altitude (km)
 		m_fWindow5EndHeight          (1, 1) double  % observation window 5 end altitude (km)
-		BeamData       (:, 1024, :) double  % size: (RangeBins × NFFT × InCohIntegrations)
+		BeamData               (:, 1024, :) double  % size: (RangeBins × NFFT × InCohIntegrations)
 
 		% ---- aliases -------------
-		ipp_us                (1, 1) double  % m_fIntrPulsePeriod_us
-		n_coh                 (1, 1) double  % m_sNumOfCohIntegrations
-		in_coh                (1, 1) double  % m_sNumOfInCohIntegrations
-		start_height          (1, 1) double  % m_fWindow1StartHeight
-		end_height            (1, 1) double  % m_fWindow1EndHeight
-		nRangeBins            (1, 1) double  % m_sNumOfRangeBins
-		nFFT                  (1, 1) double  % m_sNFFT
+		ipp_us       (1, 1) double  % m_fIntrPulsePeriod_us
+		n_coh        (1, 1) double  % m_sNumOfCohIntegrations
+		in_coh       (1, 1) double  % m_sNumOfInCohIntegrations
+		start_height (1, 1) double  % m_fWindow1StartHeight
+		end_height   (1, 1) double  % m_fWindow1EndHeight
+		nRangeBins   (1, 1) double  % m_sNumOfRangeBins
+		nFFT         (1, 1) double  % m_sNFFT
 
 
 		% --- Post-processing fields ---------
-		direction                   string  % beam direction label (vertical/north/south/west/east)
-		spectra           (:, 1024) double  % double (RangeBins × NFFT) - averaged normalised power spectrum
-		denoised_spectra  (:, 1024) double  % double (RangeBins × NFFT) - denoised power spectrum. Its absent in read_raw_data
-		M0                   (1, :) double
-		M1                   (1, :) double
-		M2                   (1, :) double
-		SNR                  (1, :) double
-		noise_level          (1, :) double
-
-		a_params        struct  % struct to store algorithm specific parameters like cost function scores
+		direction                  string  % beam direction label (vertical/north/south/west/east)
+		spectra          (:, 1024) double  % double (RangeBins × NFFT) - averaged normalised power spectrum
+		denoised_spectra (:, 1024) double  % double (RangeBins × NFFT) - denoised power spectrum. Its absent in read_raw_data
+		M0                  (1, :) double
+		M1                  (1, :) double
+		M2                  (1, :) double
+		SNR                 (1, :) double
+		noise_level         (1, :) double
+		a_params                   struct  % struct to store algorithm specific parameters like cost function scores
 
 		% ---- reference data ---------
-		ref_height           (1, :) double  % given height in the measurement
-		ref_M0               (1, :) double  % refernce 0th moment
-		ref_M1               (1, :) double  % refernce 1st moment
-		ref_M2               (1, :) double  % refernce 2nd moment
-		ref_SNR              (1, :) double  % given SNR
-		ref_noise_level      (1, :) double  % given noise level
+		ref_height      (1, :) double  % given height in the measurement
+		ref_M0          (1, :) double  % refernce 0th moment
+		ref_M1          (1, :) double  % refernce 1st moment
+		ref_M2          (1, :) double  % refernce 2nd moment
+		ref_SNR         (1, :) double  % given SNR
+		ref_noise_level (1, :) double  % given noise level
 	end
 end

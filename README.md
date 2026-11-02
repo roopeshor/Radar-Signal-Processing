@@ -117,6 +117,45 @@ sum_M1 = E.M1 + W.M1 + N.M1 + S.M1;
 calc_W = -obs.DBS_Factor * (c_th * sum_M1 + V.M1) / (4 * c_th^2 + 1);
 ```
 
+## Synthetic data creation
+
+The synthetic data is created to do batch testing of algorithms with randomized control parameters.
+All functions related to synthesis are stored in `+synth` folder
+### steps
+1. Creating a synthetic Beam header using [create_synthetic_beamheader.m](+synth/create_synthetic_beamheader.m):
+	```matlab
+	H = synth.create_synthetic_beamheader(...
+		altitudeRange="lower", ...
+		headerFields=struct("m_sCurrentBeamCnt", 2) ...
+	);
+	```
+	From many of observation it seems that there are just 3 possible set of beam header values and it depeneds on height:
+	- set1: 315m to 8100m   (lower)
+	- set2: 3150m to 20000m (middle)
+	- set2: 6030m to 32000m (upper)
+
+	So the function takes `altitudeRange` parameter (lower/middle/upper) and returns a suitable header. (It actually return a entire `RadarData` class)
+	To obtain a beam in particular direction change `m_sCurrentBeamCnt` value, see [beam count mapping](@Data/Data.m#L26) to see what values map to which direction.
+	Other parameters can be changed by passing it to `headerFields` struct.
+2. Create UVW array:
+	```matlab
+	[h, u, v, w] = synth.generate_wind_profile( ...
+		"start_height", H.start_height, ...
+		"end_height", H.end_height ...
+		"nRangeBins", H.nRangeBins, ...
+	);
+	```
+	The function also returns a array of height bins (not used usually, but just keeping for future use).
+	Many parameters can be passed to this function that alters the final velocity. see [generate_wind_profile](+synth/generate_wind_profile.m) to see all the parameters.
+3. Generate observation:
+   1. Project uvw onto radial velocity in 5 beam direcitions
+   2. convert this velocity to frequency shift
+   3. use this frequency shift to create a spectra with gaussian distribution with mean at this frequency and with some arbitrary spread
+   4. add ground clutter, DC clutter, bright bands, and IQ noise to spectrum
+   5. convert spectrum to time series (with ifft)
+
+
+
 ## More about architecture
 ### Function convention
 Put all functions related to a particular method (MCCF, MPCF, ...) into a folder.
@@ -124,34 +163,30 @@ A method probably would have some specific algorithm for computing spectrum, den
 And sometimes algorithms from unrelated methods might produce best results. So for mixing and matching algorithms a common function signature is required for each algorithms.
 
 ### Input to function
-If it depends on some part of the observation, a beam as a whole _should_ be given to the function.
-And if the function expects some other part of the observation or some custom parameters (say DBS factors, windowing functions, etc), it _should_ be passed as a optional argument.
+If it depends on the beam, then beam as a whole should be given to the function.
+And if the function expects some custom parameters (say DBS factors, windowing functions, etc), it should be passed as a optional argument.
 So a function signature should look like this:
 
 ```matlab
-function out = some_param_calculator(beam, options)
+function out = some_param_calculator(beam, cfg)
 	arguments (Input)
 		beam RadarData
-		options.window function_handle = @hann
-		options.size double = 5
+		cfg.window function_handle = @hann
+		cfg.size double = 5
 		...
 	end
-	arguments (Output)
-        out (:, 1024) double
-    end
 end
 
 out = some_param_calculator(out.north, window=@hann, size=3)
 ```
 Also optional arguments should have some default value.
 
-_Always_ add `arguments` block to every function to specify the datatype of the inputs and output.
+Always add `arguments` block to every function to specify the datatype of the inputs and outputs.
 This prevents lot of bugs and also gives useful intelllisense/suggestions in code editor.
 
 ### Output from function
 
-If the output is a required property, it should modify the beam by adding it to `a_params` of beam.
-If a function some intermediate properties, and is directly and only used by other user facing functions it can return it as such.
+If function produces some paricular parameters its is advised to put that parameter in the beam's `a_params` struct and return the beam as a whole
 This is to make the syntax more concise. Instead if all 3 moments were returned as an array, then calling the function would become verbose:
 ```matlab
 function [M0, M1, M2] = compute_moments(beam)
@@ -177,12 +212,14 @@ N = compute_moments(out.north);
 S = compute_moments(out.south);
 E = compute_moments(out.east);
 ```
-
 For this to work, the beam should have required fields (M0, ref_M0, etc).
 If beam doesnt have it, then it can store it in `a_params` parameter in the beam or
 if the parameter is something you think important, create new entry for it in [@RadarData/RadarData.m](@RadarData/RadarData.m)
 
+There can be exception to this convention, eg: utility functions that computing a scaling factor.
+
 (MATLAB doesnt have "pass by reference" to modify beam itself, hence modified beam has to be returned).
+
 
 ## Editorconfig
 Different editors use different styles to format things.. (tabs/space for indendation, `LF`/`CRLF` for line endings).
